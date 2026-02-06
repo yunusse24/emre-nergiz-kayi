@@ -38,13 +38,14 @@ export default function LandingPage() {
             Özel Ders Başvurusu
           </Link>
           
-          {/* Randevu Butonu -> Aşağıdaki ayarla diğer projeye gidecek */}
-          <Link 
-            href="/randevu" 
+          {/* Randevu Butonu -> Yeni Subdomain'e gider */}
+          <a 
+            href="https://randevu.emrenergizperformance.com" // <-- ARTIK BURAYA GİDECEK
+            target="_blank" // Yeni sekmede açılsın (isteğe bağlı, istersen silebilirsin)
             className="flex-1 border border-white/20 bg-white/5 backdrop-blur-sm text-white py-4 rounded-xl font-bold hover:bg-white/10 transition-all text-center"
           >
             Randevu Al
-          </Link>
+          </a>
         </div>
       </section>
 
