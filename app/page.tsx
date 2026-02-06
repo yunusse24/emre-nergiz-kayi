@@ -42,7 +42,6 @@ const steps: FormStep[] = [
       "15 Ders - 25.000₺"
     ], 
     key: "package",
-    // BURAYI GÜNCELLEDİK: Lokasyon bilgisi eklendi
     note: "📍 Antrenman Yeri: İstanbul Burhan Felek Atletizm Sahası\n\n⚠️ Dikkat: Paketlerin 5 hafta içerisinde bitirilmesi zorunludur. Aksi takdirde antrenman bilimi gereği gelişim %40 düşer."
   },
 ];
@@ -65,36 +64,120 @@ const BrandLogo = () => (
 );
 
 export default function RegistrationApp() {
-  const [view, setView] = useState<"form" | "admin">("form"); 
+  const [view, setView] = useState<"form" | "login" | "admin">("form"); 
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+
+  // Sayfa yüklendiğinde "Beni Hatırla" kontrolü
+  useEffect(() => {
+    const savedAuth = localStorage.getItem("emre_admin_auth");
+    if (savedAuth === "true") {
+      setIsAdminLoggedIn(true);
+    }
+  }, []);
+
+  // Admin butonuna basınca ne olacak?
+  const handleAdminClick = () => {
+    if (isAdminLoggedIn) {
+      setView("admin"); // Giriş yapılmışsa direkt panele git
+    } else {
+      setView("login"); // Yapılmamışsa login ekranına git
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#050505] text-gray-300 font-sans selection:bg-white/20 selection:text-white relative">
       
-      {/* GEÇİŞ BUTONLARI */}
+      {/* GEÇİŞ BUTONLARI (Sadece form ve admin arası) */}
       <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
-        <button 
-          onClick={() => setView("form")} 
-          className={`px-4 py-3 rounded-xl text-xs font-bold shadow-2xl backdrop-blur-md border transition-all duration-300 ${
-            view === 'form' 
-              ? 'bg-white text-black border-white scale-105' 
-              : 'bg-black/40 text-white/70 border-white/10 hover:bg-black/60'
-          }`}
-        >
-          Form
-        </button>
-        <button 
-          onClick={() => setView("admin")} 
-          className={`px-4 py-3 rounded-xl text-xs font-bold shadow-2xl backdrop-blur-md border transition-all duration-300 ${
-            view === 'admin' 
-              ? 'bg-white text-black border-white scale-105' 
-              : 'bg-black/40 text-white/70 border-white/10 hover:bg-black/60'
-          }`}
-        >
-          Admin
-        </button>
+        {view !== "login" && ( // Login ekranındayken butonları gizle
+          <>
+            <button 
+              onClick={() => setView("form")} 
+              className={`px-4 py-3 rounded-xl text-xs font-bold shadow-2xl backdrop-blur-md border transition-all duration-300 ${
+                view === 'form' 
+                  ? 'bg-white text-black border-white scale-105' 
+                  : 'bg-black/40 text-white/70 border-white/10 hover:bg-black/60'
+              }`}
+            >
+              Form
+            </button>
+            <button 
+              onClick={handleAdminClick} 
+              className={`px-4 py-3 rounded-xl text-xs font-bold shadow-2xl backdrop-blur-md border transition-all duration-300 ${
+                view === 'admin' 
+                  ? 'bg-white text-black border-white scale-105' 
+                  : 'bg-black/40 text-white/70 border-white/10 hover:bg-black/60'
+              }`}
+            >
+              Admin
+            </button>
+          </>
+        )}
       </div>
 
-      {view === "form" ? <TypeformView /> : <AdminDashboard />}
+      {view === "form" && <TypeformView />}
+      {view === "login" && <LoginView onSuccess={() => { setIsAdminLoggedIn(true); setView("admin"); }} onCancel={() => setView("form")} />}
+      {view === "admin" && <AdminDashboard />}
+    </div>
+  );
+}
+
+// --- GİRİŞ EKRANI (LOGIN) ---
+function LoginView({ onSuccess, onCancel }: { onSuccess: () => void, onCancel: () => void }) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    // ŞİFRE KONTROLÜ BURADA (İstersen değiştirebilirsin)
+    if (username.toLowerCase() === "emre" && password === "admin123") {
+      localStorage.setItem("emre_admin_auth", "true"); // Beni Hatırla Kaydı
+      onSuccess();
+    } else {
+      setError("Hatalı kullanıcı adı veya şifre!");
+    }
+  };
+
+  return (
+    <div className="flex flex-col min-h-screen items-center justify-center p-6 bg-[#050505]">
+      <div className="w-full max-w-sm bg-[#0a0a0a] border border-white/10 p-8 rounded-2xl shadow-2xl">
+        <div className="flex justify-center mb-6">
+           <div className="relative w-10 h-10"><Image src="/logo.png" alt="Logo" fill className="object-contain"/></div>
+        </div>
+        <h2 className="text-xl font-bold text-white text-center mb-6">Yönetici Girişi</h2>
+        
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div>
+            <label className="text-xs text-neutral-500 uppercase font-bold ml-1">Kullanıcı Adı</label>
+            <input 
+              type="text" 
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full bg-[#111] border border-white/10 rounded-lg p-3 text-white focus:border-white/50 focus:outline-none mt-1"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-neutral-500 uppercase font-bold ml-1">Şifre</label>
+            <input 
+              type="password" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-[#111] border border-white/10 rounded-lg p-3 text-white focus:border-white/50 focus:outline-none mt-1"
+            />
+          </div>
+          
+          {error && <p className="text-red-500 text-xs font-bold text-center">{error}</p>}
+
+          <button type="submit" className="w-full bg-white text-black font-bold py-3 rounded-lg hover:bg-neutral-200 transition-colors mt-2">
+            Giriş Yap
+          </button>
+        </form>
+        
+        <button onClick={onCancel} className="w-full text-center text-xs text-neutral-500 mt-6 hover:text-white transition-colors">
+          ← Geri Dön
+        </button>
+      </div>
     </div>
   );
 }
@@ -114,7 +197,6 @@ function TypeformView() {
     if (steps[currentStep].key === 'phone') {
         const phoneVal = String(formData.phone || "");
         const cleanPhone = phoneVal.replace(/\D/g, ''); 
-        
         if (cleanPhone.length < 10 || cleanPhone.length > 11) {
             alert("⚠️ Geçersiz Numara!\n\nLütfen telefon numaranızı eksiksiz girdiğinizden emin olun.");
             return; 
@@ -156,12 +238,10 @@ function TypeformView() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#050505] relative overflow-hidden">
-      {/* İlerleme Çubuğu */}
       <div className="w-full h-[3px] bg-white/5 fixed top-0 left-0 z-20">
         <div className="h-full bg-white/60 shadow-[0_0_15px_rgba(255,255,255,0.5)] transition-all duration-700 ease-out" style={{ width: `${progress}%` }}></div>
       </div>
 
-      {/* Header */}
       <div className="absolute top-0 left-0 w-full p-6 md:p-8 flex justify-center md:justify-start z-10">
         <BrandLogo />
       </div>
@@ -169,13 +249,11 @@ function TypeformView() {
       {isCompleted ? (
         <div className="flex-1 flex flex-col items-center justify-center text-center p-6 animate-in fade-in zoom-in duration-700">
           <div className="w-20 h-20 rounded-full border border-white/10 bg-white/5 flex items-center justify-center mb-8 text-white text-3xl shadow-2xl">✓</div>
-          
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight">Kayıt Başarılı.</h1>
           <p className="text-neutral-500 text-sm md:text-base max-w-xs mx-auto leading-relaxed mb-8">
             Başvurunuz sisteme düştü. Koçunuz en kısa sürede sizinle iletişime geçecek.
           </p>
 
-          {/* Konum Bilgisi (Başarılı ekranında da kalmaya devam ediyor) */}
           <div className="w-full max-w-sm bg-white/[0.03] border border-white/10 rounded-xl p-5 mb-8">
              <div className="flex flex-col items-center gap-2">
                 <span className="text-xl">📍</span>
@@ -188,12 +266,10 @@ function TypeformView() {
         </div>
       ) : (
         <div className="flex-1 flex flex-col justify-center p-6 max-w-xl mx-auto w-full pt-32 md:pt-0">
-          
           <div className="mb-8 md:mb-12">
             <span className="text-neutral-600 text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase block mb-4">
               ADIM {currentStep + 1} / {totalSteps}
             </span>
-            
             <h2 className="text-2xl md:text-4xl font-medium text-white leading-snug md:leading-tight">
               {question.question}
             </h2>
@@ -245,7 +321,6 @@ function TypeformView() {
               />
             )}
             
-            {/* UYARI VE LOKASYON NOTU (whitespace-pre-wrap ile satır atlaması sağlandı) */}
             {question.note && (
                 <div className="mt-6 p-4 md:p-5 bg-red-950/20 border border-red-900/30 rounded-xl">
                     <p className="text-red-400/90 text-xs md:text-sm leading-relaxed font-medium whitespace-pre-wrap">
@@ -287,6 +362,12 @@ function AdminDashboard() {
     setLoading(false);
   };
 
+  const handleLogout = () => {
+    // Çıkış yapınca beni hatırla verisini sil
+    localStorage.removeItem("emre_admin_auth");
+    window.location.reload(); // Sayfayı yenile ki giriş ekranına düşsün
+  };
+
   const formatDate = (dateString: string) => {
       const date = new Date(dateString);
       return new Intl.DateTimeFormat('tr-TR', { day: '2-digit', month: '2-digit', year: '2-digit' }).format(date);
@@ -298,7 +379,10 @@ function AdminDashboard() {
         <BrandLogo />
         <div className="flex items-center justify-between md:justify-end gap-4 w-full md:w-auto">
             <span className="text-[10px] text-neutral-600 uppercase tracking-widest">{leads.length} KAYIT</span>
-            <button onClick={fetchLeads} className="text-xs border border-white/10 px-4 py-2 rounded bg-white/[0.02] hover:bg-white/5 transition-colors text-gray-300">Yenile ↻</button>
+            <div className="flex gap-2">
+                <button onClick={fetchLeads} className="text-xs border border-white/10 px-4 py-2 rounded bg-white/[0.02] hover:bg-white/5 transition-colors text-gray-300">Yenile ↻</button>
+                <button onClick={handleLogout} className="text-xs border border-red-900/50 px-4 py-2 rounded bg-red-900/10 hover:bg-red-900/30 transition-colors text-red-500">Çıkış Yap</button>
+            </div>
         </div>
       </div>
 
