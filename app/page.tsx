@@ -39,7 +39,8 @@ const steps: FormStep[] = [
     options: [
       "1 Ders - 2.500₺", 
       "10 Ders - 20.000₺", 
-      "15 Ders - 25.000₺"
+      "15 Ders - 25.000₺",
+      "🔴 Çıkış Yap (Satın Almayacağım)" // YENİ ÇIKIŞ SEÇENEĞİ
     ], 
     key: "package",
     note: "📍 Antrenman Yeri: İstanbul Burhan Felek Atletizm Sahası\n\n⚠️ Dikkat: Paketlerin 5 hafta içerisinde bitirilmesi zorunludur. Aksi takdirde antrenman bilimi gereği gelişim %40 düşer."
@@ -63,11 +64,11 @@ const BrandLogo = () => (
   </div>
 );
 
+// --- ANA UYGULAMA ---
 export default function RegistrationApp() {
-  const [view, setView] = useState<"form" | "login" | "admin">("form"); 
+  const [view, setView] = useState<"form" | "login" | "admin" | "goodbye">("form"); 
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
 
-  // Beni Hatırla Kontrolü
   useEffect(() => {
     const savedAuth = localStorage.getItem("emre_admin_auth");
     if (savedAuth === "true") {
@@ -86,37 +87,52 @@ export default function RegistrationApp() {
   return (
     <div className="min-h-screen bg-[#050505] text-gray-300 font-sans selection:bg-white/20 selection:text-white relative">
       
-      {/* GEÇİŞ BUTONLARI */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
-        {view !== "login" && ( 
-          <>
-            <button 
-              onClick={() => setView("form")} 
-              className={`px-4 py-3 rounded-xl text-xs font-bold shadow-2xl backdrop-blur-md border transition-all duration-300 ${
-                view === 'form' 
-                  ? 'bg-white text-black border-white scale-105' 
-                  : 'bg-black/40 text-white/70 border-white/10 hover:bg-black/60'
-              }`}
-            >
-              Form
-            </button>
-            <button 
-              onClick={handleAdminClick} 
-              className={`px-4 py-3 rounded-xl text-xs font-bold shadow-2xl backdrop-blur-md border transition-all duration-300 ${
-                view === 'admin' 
-                  ? 'bg-white text-black border-white scale-105' 
-                  : 'bg-black/40 text-white/70 border-white/10 hover:bg-black/60'
-              }`}
-            >
-              Admin
-            </button>
-          </>
-        )}
-      </div>
+      {/* GEÇİŞ BUTONLARI (Form veya Admin ekranındayken göster) */}
+      {(view === "form" || view === "admin" || view === "login") && (
+        <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
+          {view !== "login" && ( 
+            <>
+              <button 
+                onClick={() => setView("form")} 
+                className={`px-4 py-3 rounded-xl text-xs font-bold shadow-2xl backdrop-blur-md border transition-all duration-300 ${
+                  view === 'form' 
+                    ? 'bg-white text-black border-white scale-105' 
+                    : 'bg-black/40 text-white/70 border-white/10 hover:bg-black/60'
+                }`}
+              >
+                Form
+              </button>
+              <button 
+                onClick={handleAdminClick} 
+                className={`px-4 py-3 rounded-xl text-xs font-bold shadow-2xl backdrop-blur-md border transition-all duration-300 ${
+                  view === 'admin' 
+                    ? 'bg-white text-black border-white scale-105' 
+                    : 'bg-black/40 text-white/70 border-white/10 hover:bg-black/60'
+                }`}
+              >
+                Admin
+              </button>
+            </>
+          )}
+        </div>
+      )}
 
-      {view === "form" && <TypeformView />}
+      {/* EKRAN YÖNETİMİ */}
+      {view === "form" && <TypeformView onExit={() => setView("goodbye")} />}
+      {view === "goodbye" && <GoodbyeView />}
       {view === "login" && <LoginView onSuccess={() => { setIsAdminLoggedIn(true); setView("admin"); }} onCancel={() => setView("form")} />}
       {view === "admin" && <AdminDashboard />}
+    </div>
+  );
+}
+
+// --- YENİ EKRAN: ÇIKIŞ YAP (Sadece Logo) ---
+function GoodbyeView() {
+  return (
+    <div className="flex flex-col min-h-screen items-center justify-center bg-[#050505] animate-in fade-in duration-1000">
+      <div className="scale-150 transform transition-transform duration-1000">
+        <BrandLogo />
+      </div>
     </div>
   );
 }
@@ -164,7 +180,7 @@ function LoginView({ onSuccess, onCancel }: { onSuccess: () => void, onCancel: (
 }
 
 // --- 1. MÜŞTERİ FORMU ---
-function TypeformView() {
+function TypeformView({ onExit }: { onExit: () => void }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<any>({});
   const [isCompleted, setIsCompleted] = useState(false);
@@ -188,10 +204,9 @@ function TypeformView() {
     }
   };
 
-  // --- BURASI GÜNCELLENDİ: Hem Supabase'e hem Telegram'a gönderiyor ---
   const submitFinalData = async (finalPackageValue: string) => {
     setIsSubmitting(true);
-    const finalData = { ...formData, package: finalPackageValue }; // Veriyi hazırla
+    const finalData = { ...formData, package: finalPackageValue }; 
     setFormData(finalData);
 
     // 1. Supabase Kaydı
@@ -211,7 +226,6 @@ function TypeformView() {
     }
 
     // 2. Telegram Bildirimi (Arka planda)
-    // Hata verse bile kullanıcıya hissettirmiyoruz
     try {
         await fetch('/api/telegram', {
             method: 'POST',
@@ -271,11 +285,26 @@ function TypeformView() {
                   <button 
                     key={i} 
                     onClick={() => { 
-                      if (question.key === 'package') { submitFinalData(opt); } else { handleChange(opt); setTimeout(handleNext, 150); }
+                      // Çıkış Butonu Kontrolü
+                      if (opt.includes("Çıkış Yap")) {
+                          onExit(); // Logolu kara ekrana at
+                      } else if (question.key === 'package') { 
+                          submitFinalData(opt); // Normal paketse kaydet
+                      } else { 
+                          handleChange(opt); 
+                          setTimeout(handleNext, 150); 
+                      }
                     }} 
-                    className="group relative w-full p-5 md:p-6 bg-white/[0.03] border border-white/[0.05] rounded-2xl text-left hover:bg-white/[0.08] hover:border-white/20 active:scale-[0.98] transition-all duration-200"
+                    className={`group relative w-full p-5 md:p-6 border rounded-2xl text-left hover:bg-white/[0.08] active:scale-[0.98] transition-all duration-200 
+                        ${opt.includes("Çıkış Yap") 
+                            ? "bg-red-900/10 border-red-900/30 hover:border-red-500/50" // Çıkış butonu kırmızımsı
+                            : "bg-white/[0.03] border-white/[0.05] hover:border-white/20" // Normal buton
+                        }
+                    `}
                   >
-                    <span className="text-gray-300 text-sm md:text-lg font-light tracking-wide group-hover:text-white transition-colors block pr-8">{opt}</span>
+                    <span className={`text-sm md:text-lg font-light tracking-wide transition-colors block pr-8 ${opt.includes("Çıkış Yap") ? "text-red-400 font-bold" : "text-gray-300 group-hover:text-white"}`}>
+                      {opt}
+                    </span>
                     <span className="absolute right-5 top-1/2 -translate-y-1/2 text-white/20 group-hover:translate-x-1 group-hover:text-white transition-all text-xl">→</span>
                   </button>
                 ))}
