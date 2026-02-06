@@ -39,3 +39,5 @@ npm run dev
 git add .
 git commit -m "admin giris sistemi eklendi"
 git push
+
+git add . && git commit -m "admin giris sistemi eklendi" && git push && npm run dev

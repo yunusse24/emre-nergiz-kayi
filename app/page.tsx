@@ -86,7 +86,7 @@ export default function LandingPage() {
               </h2>
               <div className="space-y-6 text-neutral-400 text-sm md:text-base leading-relaxed font-light">
                 <p>
-                  Marmara Üniversitesi Spor Bilimleri son sınıf öğrencisi ve <strong>Milli Takım Olimpik kadro</strong> sporcusuyum. 
+                  Marmara Üniversitesi Spor Bilimleri mezunu ve <strong>Milli Takım Olimpik kadro</strong> sporcusuyum. 
                   400m Engel branşında kazandığım <strong>86 Madalya ve 24 Kupa</strong> ile profesyonel sporculuk kariyerimi taçlandırdım.
                 </p>
                 <p>
