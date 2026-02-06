@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 
 // --- BURALARI DOLDUR ---
-const TELEGRAM_BOT_TOKEN = '8444120138:AAHA8YOCFkZgS4W6F9V-CF2OjAFAD0f8e8k';
+// (Kendi token ve ID'n burada kalsın, silme)
+const TELEGRAM_BOT_TOKEN = '8444120138:AAHA8YOCFkZgS4W6F9V-CF2OjAFAD0f8e8k'; 
 const TELEGRAM_CHAT_ID = '1420371287';
 
 export async function POST(request: Request) {
@@ -9,9 +10,9 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { name, age, phone, package: pkg, goal, instagram } = body;
 
-    // Mesajın Tasarımı
+    // --- BURAYI DEĞİŞTİRDİK: PARA KOKUSU MODU 🤑 ---
     const message = `
-🔔 *YENİ ÖĞRENCİ BAŞVURUSU!*
+🤑 *PARA KOKUSU ALIYORUM*
 
 👤 *İsim:* ${name}
 🎂 *Yaş:* ${age}
@@ -30,7 +31,8 @@ _Admin panelinden kontrol et._
       body: JSON.stringify({
         chat_id: TELEGRAM_CHAT_ID,
         text: message,
-        parse_mode: 'Markdown', // Yazıları kalın/italik yapmak için
+        parse_mode: 'Markdown',
+        disable_notification: false // Sesi zorla açtık
       }),
     });
 
