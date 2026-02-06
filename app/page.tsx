@@ -40,7 +40,7 @@ const steps: FormStep[] = [
       "1 Ders - 2.500₺", 
       "10 Ders - 20.000₺", 
       "15 Ders - 25.000₺",
-      "🔴 Çıkış Yap (Satın Almayacağım)" // YENİ ÇIKIŞ SEÇENEĞİ
+      "Çıkış Yap" // SADELEŞTİRİLDİ
     ], 
     key: "package",
     note: "📍 Antrenman Yeri: İstanbul Burhan Felek Atletizm Sahası\n\n⚠️ Dikkat: Paketlerin 5 hafta içerisinde bitirilmesi zorunludur. Aksi takdirde antrenman bilimi gereği gelişim %40 düşer."
@@ -87,7 +87,7 @@ export default function RegistrationApp() {
   return (
     <div className="min-h-screen bg-[#050505] text-gray-300 font-sans selection:bg-white/20 selection:text-white relative">
       
-      {/* GEÇİŞ BUTONLARI (Form veya Admin ekranındayken göster) */}
+      {/* GEÇİŞ BUTONLARI */}
       {(view === "form" || view === "admin" || view === "login") && (
         <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
           {view !== "login" && ( 
@@ -117,7 +117,6 @@ export default function RegistrationApp() {
         </div>
       )}
 
-      {/* EKRAN YÖNETİMİ */}
       {view === "form" && <TypeformView onExit={() => setView("goodbye")} />}
       {view === "goodbye" && <GoodbyeView />}
       {view === "login" && <LoginView onSuccess={() => { setIsAdminLoggedIn(true); setView("admin"); }} onCancel={() => setView("form")} />}
@@ -126,7 +125,7 @@ export default function RegistrationApp() {
   );
 }
 
-// --- YENİ EKRAN: ÇIKIŞ YAP (Sadece Logo) ---
+// --- GOODBYE EKRANI ---
 function GoodbyeView() {
   return (
     <div className="flex flex-col min-h-screen items-center justify-center bg-[#050505] animate-in fade-in duration-1000">
@@ -137,7 +136,7 @@ function GoodbyeView() {
   );
 }
 
-// --- GİRİŞ EKRANI (LOGIN) ---
+// --- GİRİŞ EKRANI ---
 function LoginView({ onSuccess, onCancel }: { onSuccess: () => void, onCancel: () => void }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -225,7 +224,7 @@ function TypeformView({ onExit }: { onExit: () => void }) {
         return;
     }
 
-    // 2. Telegram Bildirimi (Arka planda)
+    // 2. Telegram Bildirimi
     try {
         await fetch('/api/telegram', {
             method: 'POST',
@@ -286,23 +285,19 @@ function TypeformView({ onExit }: { onExit: () => void }) {
                     key={i} 
                     onClick={() => { 
                       // Çıkış Butonu Kontrolü
-                      if (opt.includes("Çıkış Yap")) {
-                          onExit(); // Logolu kara ekrana at
+                      if (opt === "Çıkış Yap") {
+                          onExit(); 
                       } else if (question.key === 'package') { 
-                          submitFinalData(opt); // Normal paketse kaydet
+                          submitFinalData(opt); 
                       } else { 
                           handleChange(opt); 
                           setTimeout(handleNext, 150); 
                       }
                     }} 
-                    className={`group relative w-full p-5 md:p-6 border rounded-2xl text-left hover:bg-white/[0.08] active:scale-[0.98] transition-all duration-200 
-                        ${opt.includes("Çıkış Yap") 
-                            ? "bg-red-900/10 border-red-900/30 hover:border-red-500/50" // Çıkış butonu kırmızımsı
-                            : "bg-white/[0.03] border-white/[0.05] hover:border-white/20" // Normal buton
-                        }
-                    `}
+                    // BURASI GÜNCELLENDİ: Özel stil kaldırıldı, hepsi standart
+                    className="group relative w-full p-5 md:p-6 bg-white/[0.03] border border-white/[0.05] rounded-2xl text-left hover:bg-white/[0.08] hover:border-white/20 active:scale-[0.98] transition-all duration-200"
                   >
-                    <span className={`text-sm md:text-lg font-light tracking-wide transition-colors block pr-8 ${opt.includes("Çıkış Yap") ? "text-red-400 font-bold" : "text-gray-300 group-hover:text-white"}`}>
+                    <span className="text-gray-300 text-sm md:text-lg font-light tracking-wide group-hover:text-white transition-colors block pr-8">
                       {opt}
                     </span>
                     <span className="absolute right-5 top-1/2 -translate-y-1/2 text-white/20 group-hover:translate-x-1 group-hover:text-white transition-all text-xl">→</span>
