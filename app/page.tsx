@@ -25,8 +25,7 @@ export default function LandingPage() {
         
         {/* Slogan */}
         <p className="max-w-xl text-neutral-400 text-sm md:text-lg leading-relaxed mb-10 z-10">
-          Şampiyonlar tesadüfen doğmaz, inşa edilir.<br/>
-          Bilimsel analiz ve olimpik tecrübeyle sınırlarını parçala.
+          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Voluptates, laboriosam!
         </p>
 
         {/* Butonlar */}
