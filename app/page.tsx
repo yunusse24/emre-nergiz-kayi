@@ -40,7 +40,7 @@ export default function LandingPage() {
           
           {/* RANDEVU LİNKİ: Buraya kendi randevu sisteminin linkini yapıştır */}
           <a 
-            href="https://randevu-sisteminin-linki.com" 
+            href="https://randevu-sistem-sage.vercel.app/" 
             target="_blank"
             className="flex-1 border border-white/20 bg-white/5 backdrop-blur-sm text-white py-4 rounded-xl font-bold hover:bg-white/10 transition-all text-center"
           >
