@@ -28,6 +28,61 @@ const successStories = [
     tag: "HIZ GELİŞİMİ"
   },
   // --- BURAYA KADAR ---
+  {
+    id: 4,
+    title: "100M DERECE GELİŞİMİ",
+    description: "12.4 saniye ile başladığımız serüvende, reaksiyon ve top speed çalışmalarıyla 11.1 saniye barajını kırdık.",
+    image: "/student1.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
+    tag: "HIZ GELİŞİMİ"
+  },
+
+  {
+    id: 5,
+    title: "100M DERECE GELİŞİMİ",
+    description: "12.4 saniye ile başladığımız serüvende, reaksiyon ve top speed çalışmalarıyla 11.1 saniye barajını kırdık.",
+    image: "/student1.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
+    tag: "HIZ GELİŞİMİ"
+  },
+
+  {
+    id: 6,
+    title: "100M DERECE GELİŞİMİ",
+    description: "12.4 saniye ile başladığımız serüvende, reaksiyon ve top speed çalışmalarıyla 11.1 saniye barajını kırdık.",
+    image: "/student1.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
+    tag: "HIZ GELİŞİMİ"
+  },
+
+  {
+    id: 7,
+    title: "100M DERECE GELİŞİMİ",
+    description: "12.4 saniye ile başladığımız serüvende, reaksiyon ve top speed çalışmalarıyla 11.1 saniye barajını kırdık.",
+    image: "/student1.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
+    tag: "HIZ GELİŞİMİ"
+  },
+
+  {
+    id: 8,
+    title: "100M DERECE GELİŞİMİ",
+    description: "12.4 saniye ile başladığımız serüvende, reaksiyon ve top speed çalışmalarıyla 11.1 saniye barajını kırdık.",
+    image: "/student1.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
+    tag: "HIZ GELİŞİMİ"
+  },
+
+  {
+    id: 9,
+    title: "100M DERECE GELİŞİMİ",
+    description: "12.4 saniye ile başladığımız serüvende, reaksiyon ve top speed çalışmalarıyla 11.1 saniye barajını kırdık.",
+    image: "/student1.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
+    tag: "HIZ GELİŞİMİ"
+  },
+
+  {
+    id: 10,
+    title: "100M DERECE GELİŞİMİ",
+    description: "12.4 saniye ile başladığımız serüvende, reaksiyon ve top speed çalışmalarıyla 11.1 saniye barajını kırdık.",
+    image: "/student1.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
+    tag: "HIZ GELİŞİMİ"
+  },
 ];
 
 export default function LandingPage() {
