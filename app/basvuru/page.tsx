@@ -1,7 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { supabase } from "../supabase"; // <-- "../" yaptık ki bir üst klasöre baksın
+// DİKKAT: Dosyan 'basvuru' klasöründeyse "../supabase", ana klasördeyse "./supabase" yap.
+import { supabase } from "../supabase"; 
+
 // --- TİPLER ---
 type FormStep = {
   id: number;
@@ -39,7 +41,7 @@ const steps: FormStep[] = [
       "1 Ders - 2.500₺", 
       "10 Ders - 20.000₺", 
       "15 Ders - 25.000₺",
-      "Çıkış Yap" // SADELEŞTİRİLDİ
+      "Çıkış Yap" // Sade ve standart görünüm
     ], 
     key: "package",
     note: "📍 Antrenman Yeri: İstanbul Burhan Felek Atletizm Sahası\n\n⚠️ Dikkat: Paketlerin 5 hafta içerisinde bitirilmesi zorunludur. Aksi takdirde antrenman bilimi gereği gelişim %40 düşer."
@@ -124,7 +126,7 @@ export default function RegistrationApp() {
   );
 }
 
-// --- GOODBYE EKRANI ---
+// --- GOODBYE EKRANI (Çıkış Yapınca Gelir) ---
 function GoodbyeView() {
   return (
     <div className="flex flex-col min-h-screen items-center justify-center bg-[#050505] animate-in fade-in duration-1000">
@@ -135,20 +137,35 @@ function GoodbyeView() {
   );
 }
 
-// --- GİRİŞ EKRANI ---
+// --- GÜNCELLENMİŞ LOGIN EKRANI (Loading + Pop-up Özellikli) ---
 function LoginView({ onSuccess, onCancel }: { onSuccess: () => void, onCancel: () => void }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false); 
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (username.toLowerCase() === "emre" && password === "admin123") {
-      localStorage.setItem("emre_admin_auth", "true"); 
-      onSuccess();
-    } else {
-      setError("Hatalı kullanıcı adı veya şifre!");
-    }
+    setIsLoading(true); // Yükleniyor başlasın
+
+    // Gerçekçi bir bekleme süresi (0.8 sn)
+    setTimeout(() => {
+      // 1. DOĞRU GİRİŞ
+      if (username.toLowerCase() === "emre" && password === "admin123") {
+        setIsLoading(false);
+        localStorage.setItem("emre_admin_auth", "true");
+        onSuccess();
+      } 
+      // 2. SİSTEMSEL HATA (Test için kullanıcı adına 'hata' yazarak dene)
+      else if (username.toLowerCase() === "hata") {
+        setIsLoading(false);
+        alert("⚠️ SİSTEM YOĞUNLUĞU!\n\nSistem şu an yoğunluktan dolayı yanıt veremiyor.\nLütfen doğrudan hocaya Instagram veya WhatsApp üzerinden mesaj atarak randevunuzu oluşturun.");
+      }
+      // 3. YANLIŞ BİLGİ
+      else {
+        setIsLoading(false);
+        alert("❌ GİRİŞ BAŞARISIZ\n\nKullanıcı adı veya şifre yanlış. Lütfen bilgilerinizi kontrol edip tekrar deneyin.");
+      }
+    }, 800);
   };
 
   return (
@@ -162,14 +179,39 @@ function LoginView({ onSuccess, onCancel }: { onSuccess: () => void, onCancel: (
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <label className="text-xs text-neutral-500 uppercase font-bold ml-1">Kullanıcı Adı</label>
-            <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="w-full bg-[#111] border border-white/10 rounded-lg p-3 text-white focus:border-white/50 focus:outline-none mt-1"/>
+            <input 
+              type="text" 
+              value={username} 
+              onChange={(e) => setUsername(e.target.value)} 
+              disabled={isLoading} 
+              className="w-full bg-[#111] border border-white/10 rounded-lg p-3 text-white focus:border-white/50 focus:outline-none mt-1 disabled:opacity-50 transition-opacity"
+            />
           </div>
           <div>
             <label className="text-xs text-neutral-500 uppercase font-bold ml-1">Şifre</label>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full bg-[#111] border border-white/10 rounded-lg p-3 text-white focus:border-white/50 focus:outline-none mt-1"/>
+            <input 
+              type="password" 
+              value={password} 
+              onChange={(e) => setPassword(e.target.value)} 
+              disabled={isLoading}
+              className="w-full bg-[#111] border border-white/10 rounded-lg p-3 text-white focus:border-white/50 focus:outline-none mt-1 disabled:opacity-50 transition-opacity"
+            />
           </div>
-          {error && <p className="text-red-500 text-xs font-bold text-center">{error}</p>}
-          <button type="submit" className="w-full bg-white text-black font-bold py-3 rounded-lg hover:bg-neutral-200 transition-colors mt-2">Giriş Yap</button>
+          
+          <button 
+            type="submit" 
+            disabled={isLoading} 
+            className="w-full bg-white text-black font-bold py-3 rounded-lg hover:bg-neutral-200 transition-all mt-2 disabled:bg-neutral-600 disabled:text-neutral-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            {isLoading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-neutral-400 border-t-white rounded-full animate-spin"></div>
+                Kontrol Ediliyor...
+              </>
+            ) : (
+              "Giriş Yap"
+            )}
+          </button>
         </form>
         <button onClick={onCancel} className="w-full text-center text-xs text-neutral-500 mt-6 hover:text-white transition-colors">← Geri Dön</button>
       </div>
@@ -293,7 +335,7 @@ function TypeformView({ onExit }: { onExit: () => void }) {
                           setTimeout(handleNext, 150); 
                       }
                     }} 
-                    // BURASI GÜNCELLENDİ: Özel stil kaldırıldı, hepsi standart
+                    // STANDART GÖRÜNÜM (Özel renk yok)
                     className="group relative w-full p-5 md:p-6 bg-white/[0.03] border border-white/[0.05] rounded-2xl text-left hover:bg-white/[0.08] hover:border-white/20 active:scale-[0.98] transition-all duration-200"
                   >
                     <span className="text-gray-300 text-sm md:text-lg font-light tracking-wide group-hover:text-white transition-colors block pr-8">
