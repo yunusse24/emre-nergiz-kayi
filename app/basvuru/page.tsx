@@ -1,8 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { supabase } from "../supabase"; 
-
+import { supabase } from "../supabase"; // <-- "../" yaptık ki bir üst klasöre baksın
 // --- TİPLER ---
 type FormStep = {
   id: number;
