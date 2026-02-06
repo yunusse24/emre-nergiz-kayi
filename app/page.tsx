@@ -188,26 +188,42 @@ function TypeformView() {
     }
   };
 
+  // --- BURASI GÜNCELLENDİ: Hem Supabase'e hem Telegram'a gönderiyor ---
   const submitFinalData = async (finalPackageValue: string) => {
     setIsSubmitting(true);
-    setFormData({ ...formData, package: finalPackageValue });
+    const finalData = { ...formData, package: finalPackageValue }; // Veriyi hazırla
+    setFormData(finalData);
 
+    // 1. Supabase Kaydı
     const { error } = await supabase.from('leads').insert([{
-        name: formData.name,
-        age: Number(formData.age),
-        phone: formData.phone,
-        instagram: formData.instagram,
-        goal: formData.goal,
+        name: finalData.name,
+        age: Number(finalData.age),
+        phone: finalData.phone,
+        instagram: finalData.instagram,
+        goal: finalData.goal,
         package: finalPackageValue
     }]);
 
-    setIsSubmitting(false);
-
     if (error) {
         alert("Hata: " + error.message);
-    } else {
-        setIsCompleted(true);
+        setIsSubmitting(false);
+        return;
     }
+
+    // 2. Telegram Bildirimi (Arka planda)
+    // Hata verse bile kullanıcıya hissettirmiyoruz
+    try {
+        await fetch('/api/telegram', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(finalData),
+        });
+    } catch (err) {
+        console.error("Telegram bildirimi gidemedi:", err);
+    }
+
+    setIsSubmitting(false);
+    setIsCompleted(true);
   };
 
   const handleChange = (val: string | number) => {
@@ -313,13 +329,10 @@ function AdminDashboard() {
 
   const deleteLead = async (id: number) => {
     if (!window.confirm("Bu kaydı silmek istediğine emin misin? Bu işlem geri alınamaz.")) return;
-
     const { error } = await supabase.from('leads').delete().eq('id', id);
-
     if (error) {
         alert("Hata oluştu: " + error.message);
     } else {
-        // Listeyi güncelle (Sayfayı yenilemeden silineni kaldır)
         setLeads(leads.filter(lead => lead.id !== id));
     }
   };
@@ -383,13 +396,7 @@ function AdminDashboard() {
                             <td className="py-5 px-6 text-gray-400 font-mono text-xs whitespace-nowrap">{item.phone}</td>
                             <td className="py-5 px-6 text-right text-gray-600 text-xs font-mono">{formatDate(item.created_at)}</td>
                             <td className="py-5 px-6 text-center">
-                                <button 
-                                    onClick={() => deleteLead(item.id)}
-                                    className="text-red-900 hover:text-red-500 transition-colors font-bold text-lg px-2"
-                                    title="Bu kaydı sil"
-                                >
-                                    ×
-                                </button>
+                                <button onClick={() => deleteLead(item.id)} className="text-red-900 hover:text-red-500 transition-colors font-bold text-lg px-2" title="Bu kaydı sil">×</button>
                             </td>
                         </tr>
                         ))
