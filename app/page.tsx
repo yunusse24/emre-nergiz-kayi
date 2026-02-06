@@ -1,65 +1,352 @@
+"use client";
+import { useState, useEffect } from "react";
 import Image from "next/image";
+import { supabase } from "./supabase"; 
 
-export default function Home() {
+// --- TİPLER ---
+type FormStep = {
+  id: number;
+  question: string;
+  type: "text" | "email" | "phone" | "select" | "number";
+  options?: string[];
+  placeholder?: string;
+  key: string;
+  note?: string;
+};
+
+type Lead = {
+  id: number;
+  name: string;
+  age: number;
+  package: string | null;
+  goal: string;
+  phone: string;
+  instagram: string;
+  created_at: string;
+};
+
+// --- SORULAR ---
+const steps: FormStep[] = [
+  { id: 1, question: "Önce tanışalım, ismin nedir?", type: "text", placeholder: "Adın Soyadın...", key: "name" },
+  { id: 2, question: "Kaç yaşındasın?", type: "number", placeholder: "Örn: 17", key: "age" },
+  { id: 3, question: "Sana ulaşabileceğimiz telefon numarası?", type: "phone", placeholder: "05XX XXX XX XX", key: "phone" },
+  { id: 4, question: "Instagram kullanıcı adınız?", type: "text", placeholder: "@kullaniciadi", key: "instagram" },
+  { id: 5, question: "Ana hedefin nedir?", type: "text", placeholder: "Örn: Hızlanmak, Profesyonel olmak...", key: "goal" },
+  { 
+    id: 6, 
+    question: "Hangi paketi planlıyorsun?", 
+    type: "select", 
+    options: [
+      "1 Ders - 2.500₺", 
+      "10 Ders - 20.000₺", 
+      "15 Ders - 25.000₺"
+    ], 
+    key: "package",
+    // BURAYI GÜNCELLEDİK: Lokasyon bilgisi eklendi
+    note: "📍 Antrenman Yeri: İstanbul Burhan Felek Atletizm Sahası\n\n⚠️ Dikkat: Paketlerin 5 hafta içerisinde bitirilmesi zorunludur. Aksi takdirde antrenman bilimi gereği gelişim %40 düşer."
+  },
+];
+
+// --- LOGO BİLEŞENİ ---
+const BrandLogo = () => (
+  <div className="flex items-center gap-4 select-none mb-6">
+    <div className="relative w-12 h-12 md:w-14 md:h-14 shrink-0">
+      <Image src="/logo.png" alt="Emre Nergiz Logo" fill className="object-contain" priority />
+    </div>
+    <div className="flex flex-col justify-center">
+      <h1 className="text-xl md:text-2xl font-bold text-white tracking-tight leading-none">
+        Emre Nergiz
+      </h1>
+      <span className="text-[10px] md:text-[11px] text-neutral-500 font-medium tracking-[0.35em] uppercase leading-none mt-1.5">
+        PERFORMANCE
+      </span>
+    </div>
+  </div>
+);
+
+export default function RegistrationApp() {
+  const [view, setView] = useState<"form" | "admin">("form"); 
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="min-h-screen bg-[#050505] text-gray-300 font-sans selection:bg-white/20 selection:text-white relative">
+      
+      {/* GEÇİŞ BUTONLARI */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
+        <button 
+          onClick={() => setView("form")} 
+          className={`px-4 py-3 rounded-xl text-xs font-bold shadow-2xl backdrop-blur-md border transition-all duration-300 ${
+            view === 'form' 
+              ? 'bg-white text-black border-white scale-105' 
+              : 'bg-black/40 text-white/70 border-white/10 hover:bg-black/60'
+          }`}
+        >
+          Form
+        </button>
+        <button 
+          onClick={() => setView("admin")} 
+          className={`px-4 py-3 rounded-xl text-xs font-bold shadow-2xl backdrop-blur-md border transition-all duration-300 ${
+            view === 'admin' 
+              ? 'bg-white text-black border-white scale-105' 
+              : 'bg-black/40 text-white/70 border-white/10 hover:bg-black/60'
+          }`}
+        >
+          Admin
+        </button>
+      </div>
+
+      {view === "form" ? <TypeformView /> : <AdminDashboard />}
+    </div>
+  );
+}
+
+// --- 1. MÜŞTERİ FORMU ---
+function TypeformView() {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [formData, setFormData] = useState<any>({});
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const totalSteps = steps.length;
+  const progress = ((currentStep + 1) / totalSteps) * 100;
+
+  const handleNext = () => {
+    // TELEFON KONTROLÜ
+    if (steps[currentStep].key === 'phone') {
+        const phoneVal = String(formData.phone || "");
+        const cleanPhone = phoneVal.replace(/\D/g, ''); 
+        
+        if (cleanPhone.length < 10 || cleanPhone.length > 11) {
+            alert("⚠️ Geçersiz Numara!\n\nLütfen telefon numaranızı eksiksiz girdiğinizden emin olun.");
+            return; 
+        }
+    }
+
+    if (currentStep < totalSteps - 1) {
+      setCurrentStep(prev => prev + 1);
+    }
+  };
+
+  const submitFinalData = async (finalPackageValue: string) => {
+    setIsSubmitting(true);
+    setFormData({ ...formData, package: finalPackageValue });
+
+    const { error } = await supabase.from('leads').insert([{
+        name: formData.name,
+        age: Number(formData.age),
+        phone: formData.phone,
+        instagram: formData.instagram,
+        goal: formData.goal,
+        package: finalPackageValue
+    }]);
+
+    setIsSubmitting(false);
+
+    if (error) {
+        alert("Hata: " + error.message);
+    } else {
+        setIsCompleted(true);
+    }
+  };
+
+  const handleChange = (val: string | number) => {
+    setFormData({ ...formData, [steps[currentStep].key]: val });
+  };
+
+  const question = steps[currentStep];
+
+  return (
+    <div className="flex flex-col min-h-screen bg-[#050505] relative overflow-hidden">
+      {/* İlerleme Çubuğu */}
+      <div className="w-full h-[3px] bg-white/5 fixed top-0 left-0 z-20">
+        <div className="h-full bg-white/60 shadow-[0_0_15px_rgba(255,255,255,0.5)] transition-all duration-700 ease-out" style={{ width: `${progress}%` }}></div>
+      </div>
+
+      {/* Header */}
+      <div className="absolute top-0 left-0 w-full p-6 md:p-8 flex justify-center md:justify-start z-10">
+        <BrandLogo />
+      </div>
+
+      {isCompleted ? (
+        <div className="flex-1 flex flex-col items-center justify-center text-center p-6 animate-in fade-in zoom-in duration-700">
+          <div className="w-20 h-20 rounded-full border border-white/10 bg-white/5 flex items-center justify-center mb-8 text-white text-3xl shadow-2xl">✓</div>
+          
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight">Kayıt Başarılı.</h1>
+          <p className="text-neutral-500 text-sm md:text-base max-w-xs mx-auto leading-relaxed mb-8">
+            Başvurunuz sisteme düştü. Koçunuz en kısa sürede sizinle iletişime geçecek.
           </p>
+
+          {/* Konum Bilgisi (Başarılı ekranında da kalmaya devam ediyor) */}
+          <div className="w-full max-w-sm bg-white/[0.03] border border-white/10 rounded-xl p-5 mb-8">
+             <div className="flex flex-col items-center gap-2">
+                <span className="text-xl">📍</span>
+                <p className="text-xs text-neutral-400 uppercase tracking-widest font-bold">Antrenman Yeri</p>
+                <p className="text-white text-sm font-medium">İstanbul Burhan Felek Atletizm Sahası</p>
+             </div>
+          </div>
+
+          <button onClick={() => window.location.reload()} className="text-xs text-white/40 hover:text-white border-b border-white/20 pb-1 transition-colors">Yeni Kayıt Oluştur</button>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      ) : (
+        <div className="flex-1 flex flex-col justify-center p-6 max-w-xl mx-auto w-full pt-32 md:pt-0">
+          
+          <div className="mb-8 md:mb-12">
+            <span className="text-neutral-600 text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase block mb-4">
+              ADIM {currentStep + 1} / {totalSteps}
+            </span>
+            
+            <h2 className="text-2xl md:text-4xl font-medium text-white leading-snug md:leading-tight">
+              {question.question}
+            </h2>
+          </div>
+
+          <div className="w-full mb-10 md:mb-14 space-y-4">
+            {question.type === "select" ? (
+              <div className="flex flex-col gap-3">
+                {question.options?.map((opt, i) => (
+                  <button 
+                    key={i} 
+                    onClick={() => { 
+                      if (question.key === 'package') {
+                         submitFinalData(opt);
+                      } else {
+                         handleChange(opt); 
+                         setTimeout(handleNext, 150); 
+                      }
+                    }} 
+                    className="group relative w-full p-5 md:p-6 bg-white/[0.03] border border-white/[0.05] rounded-2xl text-left hover:bg-white/[0.08] hover:border-white/20 active:scale-[0.98] transition-all duration-200"
+                  >
+                    <span className="text-gray-300 text-sm md:text-lg font-light tracking-wide group-hover:text-white transition-colors block pr-8">
+                      {opt}
+                    </span>
+                    <span className="absolute right-5 top-1/2 -translate-y-1/2 text-white/20 group-hover:translate-x-1 group-hover:text-white transition-all text-xl">→</span>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <input 
+                autoFocus
+                type={question.type}
+                placeholder={question.placeholder}
+                value={formData[question.key] || ""}
+                onChange={(e) => handleChange(e.target.value)}
+                onKeyDown={(e) => {
+                    if (e.key === "Enter" && formData[question.key]) {
+                        if (question.key === 'phone') {
+                             const phoneVal = String(formData.phone || "").replace(/\D/g, ''); 
+                             if (phoneVal.length < 10 || phoneVal.length > 11) {
+                                 alert("⚠️ Geçersiz Numara!\n\nLütfen telefon numaranızı eksiksiz girdiğinizden emin olun.");
+                                 return;
+                             }
+                        }
+                        if (currentStep < totalSteps - 1) handleNext();
+                    }
+                }}
+                className="w-full bg-transparent border-b border-white/10 pb-4 text-2xl md:text-4xl text-white focus:border-white/50 focus:outline-none placeholder:text-white/10 transition-colors font-light tracking-wide"
+              />
+            )}
+            
+            {/* UYARI VE LOKASYON NOTU (whitespace-pre-wrap ile satır atlaması sağlandı) */}
+            {question.note && (
+                <div className="mt-6 p-4 md:p-5 bg-red-950/20 border border-red-900/30 rounded-xl">
+                    <p className="text-red-400/90 text-xs md:text-sm leading-relaxed font-medium whitespace-pre-wrap">
+                        {question.note}
+                    </p>
+                </div>
+            )}
+          </div>
+
+          {question.type !== "select" && (
+            <button 
+              onClick={handleNext} 
+              disabled={!formData[question.key] || isSubmitting} 
+              className="w-full md:w-auto self-start group flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-white text-black text-sm md:text-base font-bold hover:bg-neutral-200 disabled:opacity-0 disabled:translate-y-4 transition-all duration-500 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.2)]"
+            >
+              Devam Et
+              <span className="group-hover:translate-x-1 transition-transform text-lg">→</span>
+            </button>
+          )}
         </div>
-      </main>
+      )}
+    </div>
+  );
+}
+
+// --- 2. ADMIN PANELİ ---
+function AdminDashboard() {
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchLeads();
+  }, []);
+
+  const fetchLeads = async () => {
+    setLoading(true);
+    const { data, error } = await supabase.from('leads').select('*').order('created_at', { ascending: false });
+    if (!error) setLeads(data || []);
+    setLoading(false);
+  };
+
+  const formatDate = (dateString: string) => {
+      const date = new Date(dateString);
+      return new Intl.DateTimeFormat('tr-TR', { day: '2-digit', month: '2-digit', year: '2-digit' }).format(date);
+  };
+
+  return (
+    <div className="min-h-screen bg-[#050505] p-4 md:p-10 font-sans text-gray-400 pb-24"> 
+      <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row md:items-end justify-between mb-8 md:mb-12 border-b border-white/5 pb-6 gap-6">
+        <BrandLogo />
+        <div className="flex items-center justify-between md:justify-end gap-4 w-full md:w-auto">
+            <span className="text-[10px] text-neutral-600 uppercase tracking-widest">{leads.length} KAYIT</span>
+            <button onClick={fetchLeads} className="text-xs border border-white/10 px-4 py-2 rounded bg-white/[0.02] hover:bg-white/5 transition-colors text-gray-300">Yenile ↻</button>
+        </div>
+      </div>
+
+      <div className="max-w-[1400px] mx-auto">
+        <div className="border border-white/5 rounded-2xl bg-[#0a0a0a] overflow-hidden shadow-2xl relative">
+            <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse min-w-[900px] md:min-w-0">
+                <thead>
+                    <tr className="bg-[#0f0f0f] text-gray-500 text-[10px] uppercase tracking-widest border-b border-white/5">
+                    <th className="py-5 px-6 font-bold text-white/40">İsim</th>
+                    <th className="py-5 px-6 font-bold text-white/40">Yaş</th>
+                    <th className="py-5 px-6 font-bold text-white/40">Paket</th>
+                    <th className="py-5 px-6 font-bold text-white/40">IG</th>
+                    <th className="py-5 px-6 font-bold text-white/40">Hedef</th>
+                    <th className="py-5 px-6 font-bold text-white/40">Telefon</th>
+                    <th className="py-5 px-6 font-bold text-white/40 text-right">Tarih</th>
+                    </tr>
+                </thead>
+                <tbody className="text-sm font-light">
+                    {loading ? (
+                        <tr><td colSpan={7} className="p-12 text-center text-gray-700 animate-pulse tracking-widest text-xs uppercase">Yükleniyor...</td></tr>
+                    ) : leads.length === 0 ? (
+                        <tr><td colSpan={7} className="p-12 text-center text-gray-700 tracking-widest text-xs uppercase">Henüz kayıt yok.</td></tr>
+                    ) : (
+                        leads.map((item) => (
+                        <tr key={item.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors group">
+                            <td className="py-5 px-6 text-gray-200 group-hover:text-white transition-colors font-medium">{item.name}</td>
+                            <td className="py-5 px-6 text-gray-500">{item.age}</td>
+                            <td className="py-5 px-6">
+                                <span className="bg-white/5 px-3 py-1.5 rounded text-[11px] text-gray-300 border border-white/5 whitespace-nowrap">
+                                    {item.package ? item.package.split(' -')[0] : '-'}
+                                </span>
+                            </td>
+                            <td className="py-5 px-6 text-blue-400/80 hover:text-blue-400 cursor-pointer text-xs">{item.instagram || '-'}</td>
+                            <td className="py-5 px-6 text-gray-500 max-w-[150px] truncate" title={item.goal}>{item.goal}</td>
+                            <td className="py-5 px-6 text-gray-400 font-mono text-xs whitespace-nowrap">{item.phone}</td>
+                            <td className="py-5 px-6 text-right text-gray-600 text-xs font-mono">{formatDate(item.created_at)}</td>
+                        </tr>
+                        ))
+                    )}
+                </tbody>
+                </table>
+            </div>
+        </div>
+        <div className="mt-4 md:hidden text-center text-[10px] text-gray-700 flex items-center justify-center gap-2">
+            <span>← Tabloyu kaydırmak için sürükleyin →</span>
+        </div>
+      </div>
     </div>
   );
 }
