@@ -187,11 +187,6 @@ export default function LandingPage() {
                   Amacım sadece antrenman yaptırmak değil; sporcunun kariyerini, fiziğini ve mentalitesini profesyonel seviyeye taşımak.
                 </p>
               </div>
-              
-              {/* İmza / İsim */}
-              <div className="mt-10 pt-10 border-t border-white/5">
-                <p className="font-handwriting text-2xl opacity-80">Emre Nergiz</p>
-              </div>
             </div>
           </div>
         </div>
