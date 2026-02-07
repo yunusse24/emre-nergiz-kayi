@@ -89,14 +89,19 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-red-900/30 selection:text-white">
       
-      {/* ================= HERO SECTION (DOKUNULMADI) ================= */}
-      <section className="relative h-screen flex flex-col items-center justify-center text-center px-6 overflow-hidden border-b border-white/5">
+  {/* ================= HERO SECTION (GÜNCELLENDİ) ================= */}
+      {/* h-screen yerine min-h-[90vh] yaptık ki alttaki bölüm biraz gözüksün */}
+      <section className="relative min-h-[90vh] flex flex-col items-center justify-center text-center px-6 overflow-hidden border-b border-white/5 pb-10">
+        
+        {/* Arka Plan */}
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-red-900/10 via-transparent to-[#050505] z-0"></div>
         
+        {/* Logo */}
         <div className="relative w-24 h-24 md:w-32 md:h-32 mb-8 z-10 animate-in fade-in zoom-in duration-1000">
           <Image src="/logo.png" alt="Emre Nergiz" fill className="object-contain" priority />
         </div>
 
+        {/* Başlık */}
         <h1 className="text-4xl md:text-7xl font-bold tracking-tighter mb-4 z-10">
           EMRE NERGİZ
         </h1>
@@ -104,12 +109,14 @@ export default function LandingPage() {
           ELITE PERFORMANCE COACHING
         </p>
         
+        {/* Slogan */}
         <p className="max-w-xl text-neutral-400 text-sm md:text-lg leading-relaxed mb-10 z-10">
           Şampiyonlar tesadüfen doğmaz, inşa edilir.<br/>
           Bilimsel analiz ve olimpik tecrübeyle sınırlarını parçala.
         </p>
 
-        <div className="flex flex-col md:flex-row gap-4 w-full max-w-md z-10">
+        {/* Butonlar */}
+        <div className="flex flex-col md:flex-row gap-4 w-full max-w-md z-10 mb-12">
           <Link href="/basvuru" className="flex-1 bg-white text-black py-4 rounded-xl font-bold hover:bg-neutral-200 transition-all text-center">
             Özel Ders Başvurusu
           </Link>
@@ -117,6 +124,37 @@ export default function LandingPage() {
             Randevu Al
           </a>
         </div>
+
+        {/* --- YILAN İNİŞ ANİMASYONU --- */}
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 opacity-60 hover:opacity-100 transition-opacity cursor-pointer">
+           <span className="text-[9px] uppercase tracking-widest text-neutral-500 animate-pulse">Kaydır</span>
+           {/* Yılan S Ok */}
+           <svg 
+             width="24" 
+             height="40" 
+             viewBox="0 0 24 40" 
+             fill="none" 
+             className="animate-bounce" // Zıplama efekti
+             xmlns="http://www.w3.org/2000/svg"
+           >
+             {/* Yılanın Gövdesi (S Şekli) */}
+             <path 
+               d="M12 2C12 2 8 6 8 10C8 14 16 16 16 20C16 24 12 28 12 28" 
+               stroke="#EF4444" // Kırmızı renk (Markana uygun)
+               strokeWidth="2" 
+               strokeLinecap="round"
+             />
+             {/* Ok Ucu */}
+             <path 
+               d="M8 26L12 30L16 26" 
+               stroke="#EF4444" 
+               strokeWidth="2" 
+               strokeLinecap="round" 
+               strokeLinejoin="round"
+             />
+           </svg>
+        </div>
+
       </section>
 
 
