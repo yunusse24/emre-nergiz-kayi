@@ -8,24 +8,24 @@ const successStories = [
   {
     id: 1,
     title: "FENERBAHÇE'YE TRANSFER",
-    description: "X Mahalle Kulübü Elite Lig'den aldığımız sporcumuzu, 6 aylık patlayıcı güç ve teknik antrenman programı sonucunda Fenerbahçe Spor Kulübü'ne transfer ettik.",
+    description: "Bağlarbaşı sk da oynayan sporcum teknik becerileri son derecede yetenekli bir sporcuydu lakin dayanıklılık ve hız sorunundan kaynaklı çabuk yoruluyor performansı düşüyordu. 8 aylık birlikteliğimizin ardından geçtiğimiz sezon 10 gol atan sporcum bu sezon 28 gol ve asiste ulaştı. Fenerbahçe'nin ve Beşiktaş'ın Scout ekibi sezon bitince takımlarında antrenmana çıkmasını istediler.",
     image: "/student1.jpg", // public klasöründeki fotoğraf adı
-    tag: "KARİYER YÖNETİMİ"
+    tag: "KARİYER SIÇRAMASI"
   },
   {
     id: 2,
     title: "BİYOMEKANİK DÜZELTME",
-    description: "Koşu sırasında dizlerin içe kaçma (Valgus) problemini 8 haftalık düzeltici egzersiz serisiyle çözdük. Artık sakatlık riski olmadan maksimum hızına ulaşıyor.",
+    description: "Koşu sırasında dizlerin dışa kaçma (Varum) problemini 8 haftalık direnç bandı ve kuvvet antrenmanlarıyla çözdük. Artık sakatlık riski olmadan maksimum kuvvet ve sürat antrenmanları yapabiliyor ve gelişim katsayısı hızla artıyor.",
     image: "/student2.jpg",
     tag: "SAKATLIK ÖNLEME"
   },
   // --- YENİ EKLEMEK İÇİN BURADAN AŞAĞISINI KOPYALA ---
   {
     id: 3,
-    title: "100M DERECE GELİŞİMİ",
-    description: "12.4 saniye ile başladığımız serüvende, reaksiyon ve top speed çalışmalarıyla 11.1 saniye barajını kırdık.",
+    title: "Kadro dışından ilk 11'e",
+    description: "Antalya spor altyapısında olan sporcum geçtiğimiz sezon 9 maçta kadro dışı kaldı, hocası 'performansını yükseltmezsen gelecek sezon kadroda değilsin' demesinin üzerine İstanbul'da yaz boyu haftada 6 gün benimle çalıştı. Bu süreçte dayanıklılığını patlayıcılığı ve son süratini yüksek miktarda geliştirdim. bu sezon her maça ilk 11 çıktı ve takımın en hızlı oyuncusu haline geldi. ",
     image: "/student1.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
-    tag: "HIZ GELİŞİMİ"
+    tag: "TAKIMDAN ATILIM"
   },
   // --- BURAYA KADAR ---
   {
@@ -125,7 +125,7 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-col md:flex-row items-center gap-12 md:gap-20">
             {/* Fotoğraf Alanı */}
-            <div className="relative w-full md:w-5/12 aspect-[3/4] grayscale hover:grayscale-0 transition-all duration-700">
+            <div className="relative w-full md:w-5/12 aspect-[3/4] transition-all duration-700">
               <div className="absolute inset-0 border border-white/10 rounded-sm translate-x-3 translate-y-3 z-0"></div>
               <div className="relative h-full w-full bg-neutral-900 overflow-hidden border border-white/10 z-10">
                 {/* Profil Fotonu 'profil.jpg' olarak public klasörüne at */}
