@@ -30,32 +30,32 @@ const successStories = [
   // --- BURAYA KADAR ---
   {
     id: 4,
-    title: "100M DERECE GELİŞİMİ",
-    description: "12.4 saniye ile başladığımız serüvende, reaksiyon ve top speed çalışmalarıyla 11.1 saniye barajını kırdık.",
+    title: "Dikey Sıçrama ve Hava Hakimiyeti",
+    description: "Hava toplarında zaafı olan 1.82 boyundaki stoper öğrencimle, 12 haftalık plyometrik ve eksantrik yüklenme antrenmanları uyguladım. Dikey sıçrama mesafesini 14 cm artırarak boy dezavantajını ortadan kaldırdık. Sezonun ikinci yarısında duran toplardan 4 gol bularak takıma büyük katkıda bulundu.",
     image: "/student1.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
     tag: "HIZ GELİŞİMİ"
   },
 
   {
     id: 5,
-    title: "100M DERECE GELİŞİMİ",
-    description: "12.4 saniye ile başladığımız serüvende, reaksiyon ve top speed çalışmalarıyla 11.1 saniye barajını kırdık.",
+    title: "İlk Adım ve Reaksiyon",
+    description: "Tekniği çok iyi olmasına rağmen 'yavaş' olduğu için elit takımların radarına giremeyen öğrencimin ilk 5 metre patlayıcılığı üzerine çalıştık. Sprint mekaniğini baştan aşağı değiştirerek ivmelenme süresini elit seviyeye çektik. Bu sezon 8 gol ve 16 asist yaptı.",
     image: "/student1.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
     tag: "HIZ GELİŞİMİ"
   },
 
   {
     id: 6,
-    title: "100M DERECE GELİŞİMİ",
-    description: "12.4 saniye ile başladığımız serüvende, reaksiyon ve top speed çalışmalarıyla 11.1 saniye barajını kırdık.",
+    title: "Yüksek Şiddetli Koşu Kapasitesi / Laktik Asit Toleransı",
+    description: "Maçın son 20 dakikasında laktik asit eşiği düşük olduğu için oyundan kopan merkez orta saha oyuncumla 4 aylık interval ve dayanıklılık odaklı bir periyot geçirdik. Yüksek şiddetli koşu (High Intensity Running) mesafesini maç başına 800 metreden 1400 metreye çıkardık; artık maçın 90. dakikasında bile geçiş hücumlarını yönetiyor.",
     image: "/student1.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
     tag: "HIZ GELİŞİMİ"
   },
 
   {
     id: 7,
-    title: "100M DERECE GELİŞİMİ",
-    description: "12.4 saniye ile başladığımız serüvende, reaksiyon ve top speed çalışmalarıyla 11.1 saniye barajını kırdık.",
+    title: "Biyomekanik ve Esneklik",
+    description: "Düşük esneklik kabiliyeti olan sporcum hareket kısıklılığı nedeniyle kaslarını kuvvetlendiremiyor ve yük dizlerine binip çeşitli hamstring ve diz sakatlık/yaralanmaları yaşıyordu. Acı dolu 8 haftanın ardından hareket kabiliyeti artan sporcum hem patlayıcı güç antrenmanlarımı yapabiliyor ve sakatlıktan korunarak becerilerini sergileyebiliyor. ",
     image: "/student1.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
     tag: "HIZ GELİŞİMİ"
   },
