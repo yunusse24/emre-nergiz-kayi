@@ -39,7 +39,7 @@ const successStories = [
   {
     id: 5,
     title: "İlk Adım ve Reaksiyon",
-    description: "Tekniği çok iyi olmasına rağmen 'yavaş' olduğu için elit takımların radarına giremeyen öğrencimin ilk 5 metre patlayıcılığı üzerine çalıştık. Sprint mekaniğini baştan aşağı değiştirerek ivmelenme süresini elit seviyeye çektik. Bu sezon 8 gol ve 16 asist yaptı.",
+    description: "Tekniği çok iyi olmasına rağmen 'yavaş' olduğu için elit takımların radarına giremeyen öğrencimin ilk 5 metre patlayıcılığı üzerine çalıştık. Sprint mekaniğini baştan aşağı değiştirerek ivmelenme süresini elit seviyeye çektik. Bu sezon 8 gol ve 17 asist yaptı.",
     image: "/student1.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
     tag: "İlk Adım ve Reaksiyon"
   },
@@ -47,7 +47,7 @@ const successStories = [
   {
     id: 6,
     title: "Yüksek Şiddetli Koşu Kapasitesi / Laktik Asit Toleransı",
-    description: "Maçın son 20 dakikasında laktik asit eşiği düşük olduğu için oyundan kopan merkez orta saha oyuncumla 4 aylık interval ve dayanıklılık odaklı bir periyot geçirdik. Yüksek şiddetli koşu (High Intensity Running) mesafesini maç başına 800 metreden 1400 metreye çıkardık; artık maçın 90. dakikasında bile geçiş hücumlarını yönetiyor.",
+    description: "Maçın son 20 dakikasında laktik asit eşiği düşük olduğu için oyundan kopan merkez orta saha oyuncumla 4 aylık interval ve dayanıklılık odaklı bir periyot geçirdik. Yüksek şiddetli koşu (High Intensity Running) mesafesini kat ve kat arttırdık, artık maçın 90. dakikasında bile geçiş hücumlarını yönetiyor.",
     image: "/student1.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
     tag: "Laktik Asit Toleransı"
   },
@@ -58,30 +58,6 @@ const successStories = [
     description: "Düşük esneklik kabiliyeti olan sporcum hareket kısıklılığı nedeniyle kaslarını kuvvetlendiremiyor ve yük dizlerine binip çeşitli hamstring ve diz sakatlık/yaralanmaları yaşıyordu. Acı dolu 8 haftanın ardından hareket kabiliyeti artan sporcum hem patlayıcı güç antrenmanlarımı yapabiliyor ve sakatlıktan korunarak becerilerini sergileyebiliyor. ",
     image: "/student1.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
     tag: "Biyomekanik ve Esneklik"
-  },
-
-  {
-    id: 8,
-    title: "100M DERECE GELİŞİMİ",
-    description: "12.4 saniye ile başladığımız serüvende, reaksiyon ve top speed çalışmalarıyla 11.1 saniye barajını kırdık.",
-    image: "/student1.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
-    tag: "HIZ GELİŞİMİ"
-  },
-
-  {
-    id: 9,
-    title: "100M DERECE GELİŞİMİ",
-    description: "12.4 saniye ile başladığımız serüvende, reaksiyon ve top speed çalışmalarıyla 11.1 saniye barajını kırdık.",
-    image: "/student1.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
-    tag: "HIZ GELİŞİMİ"
-  },
-
-  {
-    id: 10,
-    title: "100M DERECE GELİŞİMİ",
-    description: "12.4 saniye ile başladığımız serüvende, reaksiyon ve top speed çalışmalarıyla 11.1 saniye barajını kırdık.",
-    image: "/student1.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
-    tag: "HIZ GELİŞİMİ"
   },
 ];
 
@@ -199,7 +175,12 @@ export default function LandingPage() {
           
           <div className="text-center mb-16">
             <span className="text-red-500 font-bold tracking-[0.3em] text-[10px] uppercase">SONUÇ ODAKLI</span>
-            <h2 className="text-2xl md:text-4xl font-bold mt-2">BAŞARI HİKAYELERİ</h2>
+            <h2 className="text-2xl md:text-4xl font-bold mt-2 text-white">BAŞARI HİKAYELERİ</h2>
+            
+            {/* EKLENEN KISIM: Silik Uyarı Metni */}
+            <p className="text-[10px] text-white/20 mt-3 font-light italic tracking-wide">
+              (Çocuk hakları ve gizlilik nedeniyle temsili resimler kullanılmıştır)
+            </p>
           </div>
 
           <div className="flex flex-col gap-24">
