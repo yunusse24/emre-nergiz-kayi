@@ -215,7 +215,8 @@ export default function LandingPage() {
                 <div className="relative bg-[#0a0a0a] border border-white/10 p-2 md:p-4 rounded-2xl md:rounded-3xl hover:border-white/20 transition-colors duration-500">
                   
                   {/* Fotoğraf */}
-                  <div className="relative w-full aspect-video md:aspect-[21/9] rounded-xl md:rounded-2xl overflow-hidden mb-6 md:mb-8 bg-neutral-900">
+                  {/* aspect-[4/5] yaparak tam Instagram dikey post boyutuna getirdik */}
+                    <div className="relative w-full aspect-[4/5] md:aspect-[4/5] max-w-md mx-auto rounded-xl md:rounded-2xl overflow-hidden mb-6 md:mb-8 bg-neutral-900 border border-white/10 shadow-2xl">
                     <Image 
                       src={story.image} 
                       alt={story.title} 
