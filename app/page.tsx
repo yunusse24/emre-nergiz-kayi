@@ -178,7 +178,7 @@ export default function LandingPage() {
             <h2 className="text-2xl md:text-4xl font-bold mt-2 text-white">BAŞARI HİKAYELERİ</h2>
             
             {/* EKLENEN KISIM: Silik Uyarı Metni */}
-            <p className="text-[10px] text-white/20 mt-3 font-light italic tracking-wide">
+            <p className="text-[10px] text-white/40 mt-3 font-light italic tracking-wide">
               (Çocuk hakları ve gizlilik nedeniyle temsili resimler kullanılmıştır)
             </p>
           </div>
