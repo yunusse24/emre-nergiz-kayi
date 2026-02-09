@@ -191,37 +191,76 @@ function LoginView({ onSuccess, onCancel }: { onSuccess: () => void, onCancel: (
   );
 }
 
-// --- MÜŞTERİ FORMU (VERİ MADENCİLİĞİ EKLENDİ) ---
+// --- MÜŞTERİ FORMU (ADIM ADIM TAKİP SİSTEMİ) ---
 function TypeformView({ onExit }: { onExit: () => void }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<any>({});
   const [isCompleted, setIsCompleted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // ÖNEMLİ: Bu kullanıcının ID'sini tutuyoruz ki her adımda yeni kayıt açmasın, mevcudu güncellesin
+  const [leadId, setLeadId] = useState<number | null>(null);
 
   const totalSteps = steps.length;
   const progress = ((currentStep + 1) / totalSteps) * 100;
 
-  // --- KRİTİK FONKSİYON: FİYAT ÇIKIŞLARINI DA KAYDEDER ---
+  // --- ARKA PLAN KAYIT FONKSİYONU ---
+  // Bu fonksiyon her 'İleri' tuşuna basıldığında sessizce çalışır.
+  const saveProgress = async (newData: any) => {
+    const payload = {
+        name: newData.name,
+        age: newData.age ? Number(newData.age) : null,
+        phone: newData.phone,
+        instagram: newData.instagram,
+        goal: newData.goal,
+        // Eğer paket seçilmediyse "YARIM_BIRAKTI" olarak etiketle
+        package: newData.package || "YARIM_BIRAKTI" 
+    };
+
+    if (leadId) {
+        // Eğer zaten bir ID varsa (isim girdiyse), o satırı GÜNCELLE
+        const { error } = await supabase.from('leads').update(payload).eq('id', leadId);
+        if (error) console.error("Update Hatası:", error);
+    } else {
+        // ID yoksa (İlk adım), yeni satır EKLE
+        if (newData.name && newData.name.length > 2) {
+            const { data, error } = await supabase.from('leads').insert([payload]).select().single();
+            if (!error && data) {
+                setLeadId(data.id); // ID'yi hafızaya al
+            }
+        }
+    }
+  };
+
+  const handleNext = async () => {
+    // Validasyon
+    if (steps[currentStep].key === 'phone') {
+        const phoneVal = String(formData.phone || "");
+        const cleanPhone = phoneVal.replace(/\D/g, ''); 
+        if (cleanPhone.length < 10 || cleanPhone.length > 11) {
+            alert("⚠️ Geçersiz Numara!\n\nLütfen telefon numaranızı eksiksiz girdiğinizden emin olun.");
+            return; 
+        }
+    }
+
+    // --- KRİTİK NOKTA: Bir sonraki soruya geçmeden önce KAYDET ---
+    await saveProgress(formData);
+
+    if (currentStep < totalSteps - 1) {
+      setCurrentStep(prev => prev + 1);
+    }
+  };
+
+  // --- FİNAL (PAKET SEÇİMİ) ---
   const submitFinalData = async (finalPackageValue: string, isDropOff: boolean = false) => {
     setIsSubmitting(true);
     const finalData = { ...formData, package: finalPackageValue }; 
     setFormData(finalData);
 
-    // 1. Supabase Kaydı
-    const { error } = await supabase.from('leads').insert([{
-        name: finalData.name,
-        age: Number(finalData.age),
-        phone: finalData.phone,
-        instagram: finalData.instagram,
-        goal: finalData.goal,
-        package: finalPackageValue // "FİYAT_ÇIKIŞ" veya seçilen paket
-    }]);
+    // Son kez güncelle (Paket bilgisini veya FİYAT_ÇIKIŞ durumunu işle)
+    await saveProgress(finalData);
 
-    if (error) {
-        console.error("Kayıt hatası:", error.message);
-    }
-
-    // 2. Telegram Bildirimi
+    // Telegram Bildirimi
     try {
         const message = isDropOff 
             ? `📉 <b>FİYAT KAYBI</b>\n👤 ${finalData.name}\n📱 ${finalData.phone}\n⚠️ Fiyatı görüp çıktı.` 
@@ -239,23 +278,9 @@ function TypeformView({ onExit }: { onExit: () => void }) {
     setIsSubmitting(false);
 
     if (isDropOff) {
-        onExit(); // Eğer "Çıkış Yap" dediyse Logo ekranına at
+        onExit(); // Çıkış
     } else {
-        setIsCompleted(true); // Paket seçtiyse Onay ekranına at
-    }
-  };
-
-  const handleNext = () => {
-    if (steps[currentStep].key === 'phone') {
-        const phoneVal = String(formData.phone || "");
-        const cleanPhone = phoneVal.replace(/\D/g, ''); 
-        if (cleanPhone.length < 10 || cleanPhone.length > 11) {
-            alert("⚠️ Geçersiz Numara!\n\nLütfen telefon numaranızı eksiksiz girdiğinizden emin olun.");
-            return; 
-        }
-    }
-    if (currentStep < totalSteps - 1) {
-      setCurrentStep(prev => prev + 1);
+        setIsCompleted(true); // Onay
     }
   };
 
@@ -305,7 +330,6 @@ function TypeformView({ onExit }: { onExit: () => void }) {
                     key={i} 
                     onClick={() => { 
                       if (opt === "Çıkış Yap") {
-                          // "ÇIKIŞ YAP" BUTONUNA BASINCA VERİYİ KAYDEDİP ÇIKIŞ EKRANINA ATIYORUZ
                           submitFinalData("FİYAT_ÇIKIŞ", true); 
                       } else if (question.key === 'package') { 
                           submitFinalData(opt, false); 
@@ -330,6 +354,8 @@ function TypeformView({ onExit }: { onExit: () => void }) {
                 placeholder={question.placeholder}
                 value={formData[question.key] || ""}
                 onChange={(e) => handleChange(e.target.value)}
+                // INPUTTAN ÇIKINCA OTOMATİK KAYDET (Blur)
+                onBlur={() => saveProgress(formData)}
                 onKeyDown={(e) => {
                     if (e.key === "Enter" && formData[question.key]) {
                         if (question.key === 'phone') {
@@ -354,7 +380,7 @@ function TypeformView({ onExit }: { onExit: () => void }) {
   );
 }
 
-// --- ADMIN PANELİ (FİYAT ANALİZ ÖZELLİĞİ EKLENDİ) ---
+// --- ADMIN PANELİ (GELİŞMİŞ ANALİZ) ---
 function AdminDashboard() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
@@ -427,23 +453,32 @@ function AdminDashboard() {
                         <tr><td colSpan={9} className="p-12 text-center text-gray-700 tracking-widest text-xs uppercase">Henüz kayıt yok.</td></tr>
                     ) : (
                         leads.map((item) => {
-                          // Fiyat yüzünden çıkanları tespit et
                           const isDropOff = item.package === "FİYAT_ÇIKIŞ";
+                          const isIncomplete = item.package === "YARIM_BIRAKTI";
+                          
+                          let rowClass = 'hover:bg-white/[0.02]';
+                          if (isDropOff) rowClass = 'bg-red-900/5 hover:bg-red-900/10';
+                          if (isIncomplete) rowClass = 'bg-yellow-900/5 hover:bg-yellow-900/10';
+
                           return (
-                            <tr key={item.id} className={`border-b border-white/5 transition-colors group ${isDropOff ? 'bg-red-900/5 hover:bg-red-900/10' : 'hover:bg-white/[0.02]'}`}>
-                                {/* 1. Sütun: Durum Göstergesi */}
+                            <tr key={item.id} className={`border-b border-white/5 transition-colors group ${rowClass}`}>
+                                {/* Durum Göstergesi */}
                                 <td className="py-5 px-6">
                                     {isDropOff ? (
                                         <span className="text-[10px] bg-red-900/30 text-red-500 px-2 py-1 rounded border border-red-900/50 font-bold tracking-wider">KAÇTI</span>
+                                    ) : isIncomplete ? (
+                                        <span className="text-[10px] bg-yellow-900/30 text-yellow-500 px-2 py-1 rounded border border-yellow-900/50 font-bold tracking-wider">YARIM</span>
                                     ) : (
                                         <span className="text-[10px] bg-green-900/30 text-green-500 px-2 py-1 rounded border border-green-900/50 font-bold tracking-wider">ADAY</span>
                                     )}
                                 </td>
-                                <td className={`py-5 px-6 font-medium ${isDropOff ? 'text-white/40' : 'text-gray-200 group-hover:text-white'}`}>{item.name}</td>
+                                <td className={`py-5 px-6 font-medium ${isDropOff || isIncomplete ? 'text-white/60' : 'text-gray-200 group-hover:text-white'}`}>{item.name}</td>
                                 <td className="py-5 px-6 text-gray-500">{item.age}</td>
                                 <td className="py-5 px-6">
                                     {isDropOff ? (
                                         <span className="text-red-400/50 text-xs italic">Fiyatı Gördü & Çıktı</span>
+                                    ) : isIncomplete ? (
+                                        <span className="text-yellow-400/50 text-xs italic">Formu Tamamlamadı</span>
                                     ) : (
                                         <span className="bg-white/5 px-3 py-1.5 rounded text-[11px] text-gray-300 border border-white/5 whitespace-nowrap">
                                             {item.package ? item.package.split(' -')[0] : '-'}
