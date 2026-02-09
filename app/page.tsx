@@ -9,7 +9,7 @@ const successStories = [
     id: 1,
     title: "FENERBAHÇE'YE TRANSFER",
     description: "Bağlarbaşı sk da oynayan sporcum teknik becerileri son derecede yetenekli bir sporcuydu lakin dayanıklılık ve hız sorunundan kaynaklı çabuk yoruluyor performansı düşüyordu. 8 aylık birlikteliğimizin ardından geçtiğimiz sezon 10 gol atan sporcum bu sezon 28 gol ve asiste ulaştı. Fenerbahçe'nin ve Beşiktaş'ın Scout ekibi sezon bitince takımlarında antrenmana çıkmasını istediler.",
-    image: "/student1.jpg", // public klasöründeki fotoğraf adı
+    image: "/student2.jpg", // public klasöründeki fotoğraf adı
     tag: "FENERBAHÇE'YE TRANSFER"
   },
   {
@@ -24,7 +24,7 @@ const successStories = [
     id: 3,
     title: "Kadro dışından ilk 11'e",
     description: "Antalya spor altyapısında olan sporcum geçtiğimiz sezon 9 maçta kadro dışı kaldı, hocası 'performansını yükseltmezsen gelecek sezon kadroda değilsin' demesinin üzerine İstanbul'da yaz boyu haftada 6 gün benimle çalıştı. Bu süreçte dayanıklılığını patlayıcılığı ve son süratini yüksek miktarda geliştirdim. bu sezon her maça ilk 11 çıktı ve takımın en hızlı oyuncusu haline geldi. ",
-    image: "/student1.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
+    image: "/student2.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
     tag: "Kadro dışından ilk 11'e"
   },
   // --- BURAYA KADAR ---
@@ -32,7 +32,7 @@ const successStories = [
     id: 4,
     title: "Dikey Sıçrama ve Hava Hakimiyeti",
     description: "Hava toplarında zaafı olan 1.82 boyundaki stoper öğrencimle, 12 haftalık plyometrik ve eksantrik yüklenme antrenmanları uyguladım. Dikey sıçrama mesafesini 14 cm artırarak boy dezavantajını ortadan kaldırdık. Sezonun ikinci yarısında duran toplardan 4 gol bularak takıma büyük katkıda bulundu.",
-    image: "/student1.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
+    image: "/student2.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
     tag: "Dikey Sıçrama ve Hava Hakimiyeti"
   },
 
@@ -40,7 +40,7 @@ const successStories = [
     id: 5,
     title: "İlk Adım ve Reaksiyon",
     description: "Tekniği çok iyi olmasına rağmen 'yavaş' olduğu için elit takımların radarına giremeyen öğrencimin ilk 5 metre patlayıcılığı üzerine çalıştık. Sprint mekaniğini baştan aşağı değiştirerek ivmelenme süresini elit seviyeye çektik. Bu sezon 8 gol ve 17 asist yaptı.",
-    image: "/student1.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
+    image: "/student2.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
     tag: "İlk Adım ve Reaksiyon"
   },
 
@@ -48,7 +48,7 @@ const successStories = [
     id: 6,
     title: "Yüksek Şiddetli Koşu Kapasitesi / Laktik Asit Toleransı",
     description: "Maçın son 20 dakikasında laktik asit eşiği düşük olduğu için oyundan kopan merkez orta saha oyuncumla 4 aylık interval ve dayanıklılık odaklı bir periyot geçirdik. Yüksek şiddetli koşu (High Intensity Running) mesafesini kat ve kat arttırdık, artık maçın 90. dakikasında bile geçiş hücumlarını yönetiyor.",
-    image: "/student1.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
+    image: "/student2.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
     tag: "Laktik Asit Toleransı"
   },
 
@@ -56,7 +56,7 @@ const successStories = [
     id: 7,
     title: "Biyomekanik ve Esneklik",
     description: "Düşük esneklik kabiliyeti olan sporcum hareket kısıklılığı nedeniyle kaslarını kuvvetlendiremiyor ve yük dizlerine binip çeşitli hamstring ve diz sakatlık/yaralanmaları yaşıyordu. Acı dolu 8 haftanın ardından hareket kabiliyeti artan sporcum hem patlayıcı güç antrenmanlarımı yapabiliyor ve sakatlıktan korunarak becerilerini sergileyebiliyor. ",
-    image: "/student1.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
+    image: "/student2.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
     tag: "Biyomekanik ve Esneklik"
   },
 ];
