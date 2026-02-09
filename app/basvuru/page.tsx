@@ -41,7 +41,7 @@ const steps: FormStep[] = [
       "1 Ders - 2.500₺", 
       "10 Ders - 20.000₺", 
       "15 Ders - 25.000₺",
-      "Çıkış Yap" // Sade ve standart görünüm
+      "Çıkış Yap" // Fiyatı görüp kaçanları yakalamak için tuzak
     ], 
     key: "package",
     note: "📍 Antrenman Yeri: İstanbul Burhan Felek Atletizm Sahası\n\n⚠️ Dikkat: Paketlerin 5 hafta içerisinde bitirilmesi zorunludur. Aksi takdirde antrenman bilimi gereği gelişim %40 düşer."
@@ -137,7 +137,7 @@ function GoodbyeView() {
   );
 }
 
-// --- GÜNCELLENMİŞ LOGIN EKRANI (Loading + Pop-up Özellikli) ---
+// --- LOGIN EKRANI ---
 function LoginView({ onSuccess, onCancel }: { onSuccess: () => void, onCancel: () => void }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -145,22 +145,18 @@ function LoginView({ onSuccess, onCancel }: { onSuccess: () => void, onCancel: (
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true); // Yükleniyor başlasın
+    setIsLoading(true); 
 
-    // Gerçekçi bir bekleme süresi (0.8 sn)
     setTimeout(() => {
-      // 1. DOĞRU GİRİŞ
       if (username.toLowerCase() === "emre" && password === "admin123") {
         setIsLoading(false);
         localStorage.setItem("emre_admin_auth", "true");
         onSuccess();
       } 
-      // 2. SİSTEMSEL HATA (Test için kullanıcı adına 'hata' yazarak dene)
       else if (username.toLowerCase() === "hata") {
         setIsLoading(false);
         alert("⚠️ SİSTEM YOĞUNLUĞU!\n\nSistem şu an yoğunluktan dolayı yanıt veremiyor.\nLütfen doğrudan hocaya Instagram veya WhatsApp üzerinden mesaj atarak randevunuzu oluşturun.");
       }
-      // 3. YANLIŞ BİLGİ
       else {
         setIsLoading(false);
         alert("❌ GİRİŞ BAŞARISIZ\n\nKullanıcı adı veya şifre yanlış. Lütfen bilgilerinizi kontrol edip tekrar deneyin.");
@@ -179,38 +175,14 @@ function LoginView({ onSuccess, onCancel }: { onSuccess: () => void, onCancel: (
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <label className="text-xs text-neutral-500 uppercase font-bold ml-1">Kullanıcı Adı</label>
-            <input 
-              type="text" 
-              value={username} 
-              onChange={(e) => setUsername(e.target.value)} 
-              disabled={isLoading} 
-              className="w-full bg-[#111] border border-white/10 rounded-lg p-3 text-white focus:border-white/50 focus:outline-none mt-1 disabled:opacity-50 transition-opacity"
-            />
+            <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} disabled={isLoading} className="w-full bg-[#111] border border-white/10 rounded-lg p-3 text-white focus:border-white/50 focus:outline-none mt-1 disabled:opacity-50 transition-opacity" />
           </div>
           <div>
             <label className="text-xs text-neutral-500 uppercase font-bold ml-1">Şifre</label>
-            <input 
-              type="password" 
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
-              disabled={isLoading}
-              className="w-full bg-[#111] border border-white/10 rounded-lg p-3 text-white focus:border-white/50 focus:outline-none mt-1 disabled:opacity-50 transition-opacity"
-            />
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} disabled={isLoading} className="w-full bg-[#111] border border-white/10 rounded-lg p-3 text-white focus:border-white/50 focus:outline-none mt-1 disabled:opacity-50 transition-opacity" />
           </div>
-          
-          <button 
-            type="submit" 
-            disabled={isLoading} 
-            className="w-full bg-white text-black font-bold py-3 rounded-lg hover:bg-neutral-200 transition-all mt-2 disabled:bg-neutral-600 disabled:text-neutral-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          >
-            {isLoading ? (
-              <>
-                <div className="w-4 h-4 border-2 border-neutral-400 border-t-white rounded-full animate-spin"></div>
-                Kontrol Ediliyor...
-              </>
-            ) : (
-              "Giriş Yap"
-            )}
+          <button type="submit" disabled={isLoading} className="w-full bg-white text-black font-bold py-3 rounded-lg hover:bg-neutral-200 transition-all mt-2 disabled:bg-neutral-600 disabled:text-neutral-400 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+            {isLoading ? "Kontrol Ediliyor..." : "Giriş Yap"}
           </button>
         </form>
         <button onClick={onCancel} className="w-full text-center text-xs text-neutral-500 mt-6 hover:text-white transition-colors">← Geri Dön</button>
@@ -219,7 +191,7 @@ function LoginView({ onSuccess, onCancel }: { onSuccess: () => void, onCancel: (
   );
 }
 
-// --- 1. MÜŞTERİ FORMU ---
+// --- MÜŞTERİ FORMU (VERİ MADENCİLİĞİ EKLENDİ) ---
 function TypeformView({ onExit }: { onExit: () => void }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<any>({});
@@ -229,22 +201,8 @@ function TypeformView({ onExit }: { onExit: () => void }) {
   const totalSteps = steps.length;
   const progress = ((currentStep + 1) / totalSteps) * 100;
 
-  const handleNext = () => {
-    // TELEFON KONTROLÜ
-    if (steps[currentStep].key === 'phone') {
-        const phoneVal = String(formData.phone || "");
-        const cleanPhone = phoneVal.replace(/\D/g, ''); 
-        if (cleanPhone.length < 10 || cleanPhone.length > 11) {
-            alert("⚠️ Geçersiz Numara!\n\nLütfen telefon numaranızı eksiksiz girdiğinizden emin olun.");
-            return; 
-        }
-    }
-    if (currentStep < totalSteps - 1) {
-      setCurrentStep(prev => prev + 1);
-    }
-  };
-
-  const submitFinalData = async (finalPackageValue: string) => {
+  // --- KRİTİK FONKSİYON: FİYAT ÇIKIŞLARINI DA KAYDEDER ---
+  const submitFinalData = async (finalPackageValue: string, isDropOff: boolean = false) => {
     setIsSubmitting(true);
     const finalData = { ...formData, package: finalPackageValue }; 
     setFormData(finalData);
@@ -256,28 +214,49 @@ function TypeformView({ onExit }: { onExit: () => void }) {
         phone: finalData.phone,
         instagram: finalData.instagram,
         goal: finalData.goal,
-        package: finalPackageValue
+        package: finalPackageValue // "FİYAT_ÇIKIŞ" veya seçilen paket
     }]);
 
     if (error) {
-        alert("Hata: " + error.message);
-        setIsSubmitting(false);
-        return;
+        console.error("Kayıt hatası:", error.message);
     }
 
     // 2. Telegram Bildirimi
     try {
+        const message = isDropOff 
+            ? `📉 <b>FİYAT KAYBI</b>\n👤 ${finalData.name}\n📱 ${finalData.phone}\n⚠️ Fiyatı görüp çıktı.` 
+            : `✅ <b>YENİ MÜŞTERİ</b>\n👤 ${finalData.name}\n📦 ${finalPackageValue}`;
+            
         await fetch('/api/telegram', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(finalData),
+            body: JSON.stringify({ message }),
         });
     } catch (err) {
-        console.error("Telegram bildirimi gidemedi:", err);
+        console.error("Bildirim hatası:", err);
     }
 
     setIsSubmitting(false);
-    setIsCompleted(true);
+
+    if (isDropOff) {
+        onExit(); // Eğer "Çıkış Yap" dediyse Logo ekranına at
+    } else {
+        setIsCompleted(true); // Paket seçtiyse Onay ekranına at
+    }
+  };
+
+  const handleNext = () => {
+    if (steps[currentStep].key === 'phone') {
+        const phoneVal = String(formData.phone || "");
+        const cleanPhone = phoneVal.replace(/\D/g, ''); 
+        if (cleanPhone.length < 10 || cleanPhone.length > 11) {
+            alert("⚠️ Geçersiz Numara!\n\nLütfen telefon numaranızı eksiksiz girdiğinizden emin olun.");
+            return; 
+        }
+    }
+    if (currentStep < totalSteps - 1) {
+      setCurrentStep(prev => prev + 1);
+    }
   };
 
   const handleChange = (val: string | number) => {
@@ -325,17 +304,16 @@ function TypeformView({ onExit }: { onExit: () => void }) {
                   <button 
                     key={i} 
                     onClick={() => { 
-                      // Çıkış Butonu Kontrolü
                       if (opt === "Çıkış Yap") {
-                          onExit(); 
+                          // "ÇIKIŞ YAP" BUTONUNA BASINCA VERİYİ KAYDEDİP ÇIKIŞ EKRANINA ATIYORUZ
+                          submitFinalData("FİYAT_ÇIKIŞ", true); 
                       } else if (question.key === 'package') { 
-                          submitFinalData(opt); 
+                          submitFinalData(opt, false); 
                       } else { 
                           handleChange(opt); 
                           setTimeout(handleNext, 150); 
                       }
                     }} 
-                    // STANDART GÖRÜNÜM (Özel renk yok)
                     className="group relative w-full p-5 md:p-6 bg-white/[0.03] border border-white/[0.05] rounded-2xl text-left hover:bg-white/[0.08] hover:border-white/20 active:scale-[0.98] transition-all duration-200"
                   >
                     <span className="text-gray-300 text-sm md:text-lg font-light tracking-wide group-hover:text-white transition-colors block pr-8">
@@ -376,7 +354,7 @@ function TypeformView({ onExit }: { onExit: () => void }) {
   );
 }
 
-// --- 2. ADMIN PANELİ ---
+// --- ADMIN PANELİ (FİYAT ANALİZ ÖZELLİĞİ EKLENDİ) ---
 function AdminDashboard() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
@@ -409,7 +387,7 @@ function AdminDashboard() {
 
   const formatDate = (dateString: string) => {
       const date = new Date(dateString);
-      return new Intl.DateTimeFormat('tr-TR', { day: '2-digit', month: '2-digit', year: '2-digit' }).format(date);
+      return new Intl.DateTimeFormat('tr-TR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(date);
   };
 
   return (
@@ -417,7 +395,7 @@ function AdminDashboard() {
       <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row md:items-end justify-between mb-8 md:mb-12 border-b border-white/5 pb-6 gap-6">
         <BrandLogo />
         <div className="flex items-center justify-between md:justify-end gap-4 w-full md:w-auto">
-            <span className="text-[10px] text-neutral-600 uppercase tracking-widest">{leads.length} KAYIT</span>
+            <span className="text-[10px] text-neutral-600 uppercase tracking-widest">{leads.length} TOPLAM KAYIT</span>
             <div className="flex gap-2">
                 <button onClick={fetchLeads} className="text-xs border border-white/10 px-4 py-2 rounded bg-white/[0.02] hover:bg-white/5 transition-colors text-gray-300">Yenile ↻</button>
                 <button onClick={handleLogout} className="text-xs border border-red-900/50 px-4 py-2 rounded bg-red-900/10 hover:bg-red-900/30 transition-colors text-red-500">Çıkış Yap</button>
@@ -431,9 +409,10 @@ function AdminDashboard() {
                 <table className="w-full text-left border-collapse min-w-[900px] md:min-w-0">
                 <thead>
                     <tr className="bg-[#0f0f0f] text-gray-500 text-[10px] uppercase tracking-widest border-b border-white/5">
+                    <th className="py-5 px-6 font-bold text-white/40">Durum</th>
                     <th className="py-5 px-6 font-bold text-white/40">İsim</th>
                     <th className="py-5 px-6 font-bold text-white/40">Yaş</th>
-                    <th className="py-5 px-6 font-bold text-white/40">Paket</th>
+                    <th className="py-5 px-6 font-bold text-white/40">Paket Seçimi</th>
                     <th className="py-5 px-6 font-bold text-white/40">IG</th>
                     <th className="py-5 px-6 font-bold text-white/40">Hedef</th>
                     <th className="py-5 px-6 font-bold text-white/40">Telefon</th>
@@ -443,28 +422,44 @@ function AdminDashboard() {
                 </thead>
                 <tbody className="text-sm font-light">
                     {loading ? (
-                        <tr><td colSpan={8} className="p-12 text-center text-gray-700 animate-pulse tracking-widest text-xs uppercase">Yükleniyor...</td></tr>
+                        <tr><td colSpan={9} className="p-12 text-center text-gray-700 animate-pulse tracking-widest text-xs uppercase">Yükleniyor...</td></tr>
                     ) : leads.length === 0 ? (
-                        <tr><td colSpan={8} className="p-12 text-center text-gray-700 tracking-widest text-xs uppercase">Henüz kayıt yok.</td></tr>
+                        <tr><td colSpan={9} className="p-12 text-center text-gray-700 tracking-widest text-xs uppercase">Henüz kayıt yok.</td></tr>
                     ) : (
-                        leads.map((item) => (
-                        <tr key={item.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors group">
-                            <td className="py-5 px-6 text-gray-200 group-hover:text-white transition-colors font-medium">{item.name}</td>
-                            <td className="py-5 px-6 text-gray-500">{item.age}</td>
-                            <td className="py-5 px-6">
-                                <span className="bg-white/5 px-3 py-1.5 rounded text-[11px] text-gray-300 border border-white/5 whitespace-nowrap">
-                                    {item.package ? item.package.split(' -')[0] : '-'}
-                                </span>
-                            </td>
-                            <td className="py-5 px-6 text-blue-400/80 hover:text-blue-400 cursor-pointer text-xs">{item.instagram || '-'}</td>
-                            <td className="py-5 px-6 text-gray-500 max-w-[150px] truncate" title={item.goal}>{item.goal}</td>
-                            <td className="py-5 px-6 text-gray-400 font-mono text-xs whitespace-nowrap">{item.phone}</td>
-                            <td className="py-5 px-6 text-right text-gray-600 text-xs font-mono">{formatDate(item.created_at)}</td>
-                            <td className="py-5 px-6 text-center">
-                                <button onClick={() => deleteLead(item.id)} className="text-red-900 hover:text-red-500 transition-colors font-bold text-lg px-2" title="Bu kaydı sil">×</button>
-                            </td>
-                        </tr>
-                        ))
+                        leads.map((item) => {
+                          // Fiyat yüzünden çıkanları tespit et
+                          const isDropOff = item.package === "FİYAT_ÇIKIŞ";
+                          return (
+                            <tr key={item.id} className={`border-b border-white/5 transition-colors group ${isDropOff ? 'bg-red-900/5 hover:bg-red-900/10' : 'hover:bg-white/[0.02]'}`}>
+                                {/* 1. Sütun: Durum Göstergesi */}
+                                <td className="py-5 px-6">
+                                    {isDropOff ? (
+                                        <span className="text-[10px] bg-red-900/30 text-red-500 px-2 py-1 rounded border border-red-900/50 font-bold tracking-wider">KAÇTI</span>
+                                    ) : (
+                                        <span className="text-[10px] bg-green-900/30 text-green-500 px-2 py-1 rounded border border-green-900/50 font-bold tracking-wider">ADAY</span>
+                                    )}
+                                </td>
+                                <td className={`py-5 px-6 font-medium ${isDropOff ? 'text-white/40' : 'text-gray-200 group-hover:text-white'}`}>{item.name}</td>
+                                <td className="py-5 px-6 text-gray-500">{item.age}</td>
+                                <td className="py-5 px-6">
+                                    {isDropOff ? (
+                                        <span className="text-red-400/50 text-xs italic">Fiyatı Gördü & Çıktı</span>
+                                    ) : (
+                                        <span className="bg-white/5 px-3 py-1.5 rounded text-[11px] text-gray-300 border border-white/5 whitespace-nowrap">
+                                            {item.package ? item.package.split(' -')[0] : '-'}
+                                        </span>
+                                    )}
+                                </td>
+                                <td className="py-5 px-6 text-blue-400/80 hover:text-blue-400 cursor-pointer text-xs">{item.instagram || '-'}</td>
+                                <td className="py-5 px-6 text-gray-500 max-w-[150px] truncate" title={item.goal}>{item.goal}</td>
+                                <td className="py-5 px-6 text-gray-400 font-mono text-xs whitespace-nowrap">{item.phone}</td>
+                                <td className="py-5 px-6 text-right text-gray-600 text-xs font-mono">{formatDate(item.created_at)}</td>
+                                <td className="py-5 px-6 text-center">
+                                    <button onClick={() => deleteLead(item.id)} className="text-red-900 hover:text-red-500 transition-colors font-bold text-lg px-2" title="Bu kaydı sil">×</button>
+                                </td>
+                            </tr>
+                          );
+                        })
                     )}
                 </tbody>
                 </table>
