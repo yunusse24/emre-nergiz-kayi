@@ -38,9 +38,9 @@ const steps: FormStep[] = [
     question: "Hangi paketi planlıyorsun?", 
     type: "select", 
     options: [
-      "1 Ders - 2.500₺", 
-      "10 Ders - 20.000₺", 
-      "15 Ders - 25.000₺",
+      "1 Ders - 2.000₺", 
+      "10 Ders - 15.000₺", 
+      "15 Ders - 20.000₺",
       "Çıkış Yap" // Fiyatı görüp kaçanları yakalamak için tuzak
     ], 
     key: "package",
