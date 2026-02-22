@@ -38,13 +38,13 @@ const steps: FormStep[] = [
     question: "Hangi paketi planlıyorsun?", 
     type: "select", 
     options: [
-      "1 Ders - 2.000₺", 
+      "1 Ders - 2000₺", 
       "10 Ders - 15.000₺", 
       "15 Ders - 20.000₺",
       "Çıkış Yap" // Fiyatı görüp kaçanları yakalamak için tuzak
     ], 
     key: "package",
-    note: "📍 Antrenman Yeri: İstanbul Burhan Felek Atletizm Sahası\n\n⚠️ Dikkat: Paketlerin 5 hafta içerisinde bitirilmesi zorunludur. Aksi takdirde antrenman bilimi gereği gelişim %40 düşer."
+    note: "📍 Antrenman Yeri: İstanbul Maltepe Kenan Onuk Atletizm Pisti\n\n⚠️ Dikkat: Paketlerin 5 hafta içerisinde bitirilmesi zorunludur. Aksi takdirde antrenman bilimi gereği gelişim %40 düşer."
   },
 ];
 
@@ -148,7 +148,7 @@ function LoginView({ onSuccess, onCancel }: { onSuccess: () => void, onCancel: (
     setIsLoading(true); 
 
     setTimeout(() => {
-      if (username.toLowerCase() === "emre" && password === "admin123") {
+      if (username.toLowerCase() === "emre" && password === "emre098") {
         setIsLoading(false);
         localStorage.setItem("emre_admin_auth", "true");
         onSuccess();
@@ -311,7 +311,7 @@ function TypeformView({ onExit }: { onExit: () => void }) {
              <div className="flex flex-col items-center gap-2">
                 <span className="text-xl">📍</span>
                 <p className="text-xs text-neutral-400 uppercase tracking-widest font-bold">Antrenman Yeri</p>
-                <p className="text-white text-sm font-medium">İstanbul Burhan Felek Atletizm Sahası</p>
+                <p className="text-white text-sm font-medium">İstanbul Maltepe Kenan Onuk Atletizm Pisti</p>
              </div>
           </div>
           <button onClick={() => window.location.reload()} className="text-xs text-white/40 hover:text-white border-b border-white/20 pb-1 transition-colors">Yeni Kayıt Oluştur</button>
@@ -340,9 +340,29 @@ function TypeformView({ onExit }: { onExit: () => void }) {
                     }} 
                     className="group relative w-full p-5 md:p-6 bg-white/[0.03] border border-white/[0.05] rounded-2xl text-left hover:bg-white/[0.08] hover:border-white/20 active:scale-[0.98] transition-all duration-200"
                   >
-                    <span className="text-gray-300 text-sm md:text-lg font-light tracking-wide group-hover:text-white transition-colors block pr-8">
-                      {opt}
+                    {/* YENİ FİYAT TASARIMI BURADA BAŞLIYOR */}
+                    <span className="flex items-center gap-3 text-gray-300 text-sm md:text-lg font-light tracking-wide group-hover:text-white transition-colors pr-8">
+                      <span>{opt}</span>
+                      
+                      {/* İndirimli Çapraz Çizik Fiyatlar */}
+                      {opt === "1 Ders - 2.000₺" && (
+                        <span className="text-neutral-500/60 line-through decoration-neutral-500/50 decoration-2 text-sm md:text-base font-medium">
+                          2.500₺
+                        </span>
+                      )}
+                      {opt === "10 Ders - 15.000₺" && (
+                        <span className="text-neutral-500/60 line-through decoration-neutral-500/50 decoration-2 text-sm md:text-base font-medium">
+                          20.000₺
+                        </span>
+                      )}
+                      {opt === "15 Ders - 20.000₺" && (
+                        <span className="text-neutral-500/60 line-through decoration-neutral-500/50 decoration-2 text-sm md:text-base font-medium">
+                          30.000₺
+                        </span>
+                      )}
                     </span>
+                    {/* YENİ FİYAT TASARIMI BURADA BİTİYOR */}
+
                     <span className="absolute right-5 top-1/2 -translate-y-1/2 text-white/20 group-hover:translate-x-1 group-hover:text-white transition-all text-xl">→</span>
                   </button>
                 ))}
