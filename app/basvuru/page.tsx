@@ -41,7 +41,7 @@ const steps: FormStep[] = [
       "Tek derslik bütçe (Ort. 2.250₺ - 2.750₺)", 
       "10 derslik bütçe (Ort. 20.000₺ - 23.000₺)", 
       "15 derslik bütçe (Ort. 25.000₺ - 30.000₺)",
-      "Çıkış Yap" // Fiyatı görüp kaçanları yakalamak için tuzak
+      "Şu an bütçe ayırmayı düşünmüyorum" // Fiyatı görüp kaçanları yakalamak için tuzak
     ], 
     key: "package",
     note: "📍 Antrenman Yeri: İstanbul Burhan Felek Atletizm Pisti\n\n⚠️ Not: Bu bir fiyat listesi değildir. Hedeflerinize en uygun çalışma programını belirleyebilmemiz için doldurulan tahmini bütçe anketidir. \n\n⚖️ Yasal Bilgilendirme: Bu bir satış sayfası değildir, ön görüşme ve profil analiz anketidir. Web sitemiz üzerinden hiçbir ödeme veya tahsilat yapılmamaktadır. Seçim yaparak, KVKK kapsamında iletişim bilgilerinizin sadece size ulaşabilmemiz amacıyla işlenmesine onay vermiş olursunuz."
@@ -263,9 +263,8 @@ function TypeformView({ onExit }: { onExit: () => void }) {
     // Telegram Bildirimi
     try {
         const message = isDropOff 
-            ? `📉 <b>FİYAT KAYBI</b>\n👤 ${finalData.name}\n📱 ${finalData.phone}\n⚠️ Fiyatı görüp çıktı.` 
-            : `✅ <b>YENİ MÜŞTERİ</b>\n👤 ${finalData.name}\n📦 ${finalPackageValue}`;
-            
+        ? `📉 <b>BÜTÇE REDDİ (KAYIP)</b>\n👤 ${finalData.name}\n📱 ${finalData.phone}\n⚠️ Bütçe ayırmayacağını belirtip çıktı.` 
+        : `✅ <b>PARA KOKUSU ALIYORUM</b>\n👤 ${finalData.name}\n📱 ${finalData.phone}\n🎯 Hedef: ${finalData.goal}\n📦 Bütçe: ${finalPackageValue}`;
         await fetch('/api/telegram', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
