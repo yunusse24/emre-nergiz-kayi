@@ -38,13 +38,13 @@ const steps: FormStep[] = [
     question: "Atletik gelişimin için planladığın tahmini bütçe aralığı nedir?", 
     type: "select", 
     options: [
-      "Tek derslik bütçe (Ort. 2.000₺ - 2.500₺)", 
-      "10 derslik bütçe (Ort. 15.000₺ - 17.500₺)", 
-      "15 derslik bütçe (Ort. 20.000₺ - 23.000₺)",
+      "Tek derslik bütçe (Ort. 2.250₺ - 2.750₺)", 
+      "10 derslik bütçe (Ort. 20.000₺ - 23.000₺)", 
+      "15 derslik bütçe (Ort. 25.000₺ - 30.000₺)",
       "Çıkış Yap" // Fiyatı görüp kaçanları yakalamak için tuzak
     ], 
     key: "package",
-    note: "📍 Antrenman Yeri: İstanbul Maltepe Kenan Onuk Atletizm Pisti\n\n⚠️ Not: Bu bir fiyat listesi değildir. Hedeflerinize en uygun çalışma programını belirleyebilmemiz için doldurulan tahmini bütçe anketidir."
+    note: "📍 Antrenman Yeri: İstanbul Burhan Felek Atletizm Pisti\n\n⚠️ Not: Bu bir fiyat listesi değildir. Hedeflerinize en uygun çalışma programını belirleyebilmemiz için doldurulan tahmini bütçe anketidir."
   },
 ];
 
