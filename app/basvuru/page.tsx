@@ -311,7 +311,7 @@ function TypeformView({ onExit }: { onExit: () => void }) {
              <div className="flex flex-col items-center gap-2">
                 <span className="text-xl">📍</span>
                 <p className="text-xs text-neutral-400 uppercase tracking-widest font-bold">Antrenman Yeri</p>
-                <p className="text-white text-sm font-medium">İstanbul Maltepe Kenan Onuk Atletizm Pisti</p>
+                <p className="text-white text-sm font-medium">İstanbul Burhan Felek Atletizm Pisti</p>
              </div>
           </div>
           <button onClick={() => window.location.reload()} className="text-xs text-white/40 hover:text-white border-b border-white/20 pb-1 transition-colors">Yeni Kayıt Oluştur</button>
