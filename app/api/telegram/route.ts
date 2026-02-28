@@ -1,44 +1,38 @@
 import { NextResponse } from 'next/server';
 
-// --- BURALARI DOLDUR ---
-// (Kendi token ve ID'n burada kalsın, silme)
-const TELEGRAM_BOT_TOKEN = '8444120138:AAHA8YOCFkZgS4W6F9V-CF2OjAFAD0f8e8k'; 
-const TELEGRAM_CHAT_ID = '1420371287';
-
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
-    const body = await request.json();
-    const { name, age, phone, package: pkg, goal, instagram } = body;
+    const body = await req.json();
+    
+    // Frontend'den gelen hazır süslü "message" metnini alıyoruz
+    const { message } = body;
 
-    // --- BURAYI DEĞİŞTİRDİK: PARA KOKUSU MODU 🤑 ---
-    const message = `
-🤑 *PARA KOKUSU ALIYORUM*
+    // Senin özel bot token ve chat ID bilgilerin
+    const BOT_TOKEN = '8444120138:AAHA8YOCFkZgS4W6F9V-CF2OjAFAD0f8e8k';
+    const CHAT_ID = '1420371287';
 
-👤 *İsim:* ${name}
-🎂 *Yaş:* ${age}
-📞 *Tel:* ${phone}
-📸 *IG:* ${instagram || '-'}
-📦 *Paket:* ${pkg || 'Seçilmedi'}
-🎯 *Hedef:* ${goal}
+    if (!message) {
+        return NextResponse.json({ error: "Mesaj bulunamadı" }, { status: 400 });
+    }
 
-_Admin panelinden kontrol et._
-`;
+    const telegramUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
 
-    // Telegram'a Gönder
-    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+    const response = await fetch(telegramUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
-        chat_id: TELEGRAM_CHAT_ID,
-        text: message,
-        parse_mode: 'Markdown',
-        disable_notification: false // Sesi zorla açtık
+        chat_id: CHAT_ID,
+        text: message, // Direkt o süslü mesajı gönder
+        parse_mode: 'HTML', // Kalın (bold) yazıların ve emojilerin çalışması için
       }),
     });
 
-    return NextResponse.json({ success: true });
+    const data = await response.json();
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Telegram Hatası:', error);
-    return NextResponse.json({ success: false });
+    console.error("Telegram Gönderim Hatası:", error);
+    return NextResponse.json({ error: "Sunucu hatası" }, { status: 500 });
   }
 }
