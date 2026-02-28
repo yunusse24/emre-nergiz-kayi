@@ -44,7 +44,7 @@ const steps: FormStep[] = [
       "Çıkış Yap" // Fiyatı görüp kaçanları yakalamak için tuzak
     ], 
     key: "package",
-    note: "📍 Antrenman Yeri: İstanbul Burhan Felek Atletizm Pisti\n\n⚠️ Not: Bu bir fiyat listesi değildir. Hedeflerinize en uygun çalışma programını belirleyebilmemiz için doldurulan tahmini bütçe anketidir."
+    note: "📍 Antrenman Yeri: İstanbul Burhan Felek Atletizm Pisti\n\n⚠️ Not: Bu bir fiyat listesi değildir. Hedeflerinize en uygun çalışma programını belirleyebilmemiz için doldurulan tahmini bütçe anketidir. \n\n⚖️ Yasal Bilgilendirme: Bu bir satış sayfası değildir, ön görüşme ve profil analiz anketidir. Web sitemiz üzerinden hiçbir ödeme veya tahsilat yapılmamaktadır. Seçim yaparak, KVKK kapsamında iletişim bilgilerinizin sadece size ulaşabilmemiz amacıyla işlenmesine onay vermiş olursunuz."
   },
 ];
 
