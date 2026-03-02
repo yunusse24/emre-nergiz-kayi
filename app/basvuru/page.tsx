@@ -41,7 +41,7 @@ const steps: FormStep[] = [
       "Tek derslik bütçe (Ort. 2.250₺ - 2.750₺)", 
       "10 derslik bütçe (Ort. 20.000₺ - 23.000₺)", 
       "15 derslik bütçe (Ort. 25.000₺ - 30.000₺)",
-      "Şu an bütçe ayırmayı düşünmüyorum" // Fiyatı görüp kaçanları yakalamak için tuzak
+      "Şu an bütçe ayırmayı düşünmüyorum, programlarla devam edelim" // Online Satış (Down-sell) Tuzağı
     ], 
     key: "package",
     note: "📍 Antrenman Yeri: İstanbul Burhan Felek Atletizm Pisti\n\n⚠️ Not: Bu bir fiyat listesi değildir. Hedeflerinize en uygun çalışma programını belirleyebilmemiz için doldurulan tahmini bütçe anketidir. \n\n⚖️ Yasal Bilgilendirme: Bu bir satış sayfası değildir, ön görüşme ve profil analiz anketidir. Web sitemiz üzerinden hiçbir ödeme veya tahsilat yapılmamaktadır. Seçim yaparak, KVKK kapsamında iletişim bilgilerinizin sadece size ulaşabilmemiz amacıyla işlenmesine onay vermiş olursunuz."
@@ -251,8 +251,8 @@ function TypeformView({ onExit }: { onExit: () => void }) {
     }
   };
 
-  // --- FİNAL (PAKET SEÇİMİ) ---
-  const submitFinalData = async (finalPackageValue: string, isDropOff: boolean = false) => {
+  // --- FİNAL (PAKET SEÇİMİ VE YÖNLENDİRME) ---
+  const submitFinalData = async (finalPackageValue: string, actionType: "success" | "dropoff" | "redirect" = "success") => {
     setIsSubmitting(true);
     const finalData = { ...formData, package: finalPackageValue }; 
     setFormData(finalData);
@@ -262,9 +262,15 @@ function TypeformView({ onExit }: { onExit: () => void }) {
 
     // Telegram Bildirimi
     try {
-        const message = isDropOff 
-        ? `📉 <b>BÜTÇE REDDİ (KAYIP)</b>\n👤 ${finalData.name}\n📱 ${finalData.phone}\n⚠️ Bütçe ayırmayacağını belirtip çıktı.` 
-        : `✅ <b>PARA KOKUSU ALIYORUM</b>\n👤 ${finalData.name}\n📱 ${finalData.phone}\n🎯 Hedef: ${finalData.goal}\n📦 Bütçe: ${finalPackageValue}`;
+        let message = "";
+        if (actionType === "dropoff") {
+            message = `📉 <b>BÜTÇE REDDİ (KAYIP)</b>\n👤 ${finalData.name}\n📱 ${finalData.phone}\n⚠️ Bütçe ayırmayacağını belirtip çıktı.`;
+        } else if (actionType === "redirect") {
+            message = `🛍️ <b>PROGRAM SATIŞINA YÖNLENDİRİLDİ</b>\n👤 ${finalData.name}\n📱 ${finalData.phone}\n🎯 Hedef: ${finalData.goal}\n⚠️ Özel derse bütçe ayırmadı, Shopier'e yönlendirildi.`;
+        } else {
+            message = `✅ <b>PARA KOKUSU ALIYORUM</b>\n👤 ${finalData.name}\n📱 ${finalData.phone}\n🎯 Hedef: ${finalData.goal}\n📦 Bütçe: ${finalPackageValue}`;
+        }
+
         await fetch('/api/telegram', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -276,7 +282,10 @@ function TypeformView({ onExit }: { onExit: () => void }) {
 
     setIsSubmitting(false);
 
-    if (isDropOff) {
+    // Aksiyona Göre Yönlendirme
+    if (actionType === "redirect") {
+        window.location.href = "https://www.shopier.com/emrenergiz"; // Shopier'e fırlat!
+    } else if (actionType === "dropoff") {
         onExit(); // Çıkış
     } else {
         setIsCompleted(true); // Onay
@@ -328,10 +337,11 @@ function TypeformView({ onExit }: { onExit: () => void }) {
                   <button 
                     key={i} 
                     onClick={() => { 
-                      if (opt === "Çıkış Yap") {
-                          submitFinalData("FİYAT_ÇIKIŞ", true); 
+                      if (opt === "Şu an bütçe ayırmayı düşünmüyorum, programlarla devam edelim") {
+                          // Online Programa Yönlendirme Mantığı
+                          submitFinalData("PROGRAM_YONLENDIRME", "redirect"); 
                       } else if (question.key === 'package') { 
-                          submitFinalData(opt, false); 
+                          submitFinalData(opt, "success"); 
                       } else { 
                           handleChange(opt); 
                           setTimeout(handleNext, 150); 
@@ -452,11 +462,14 @@ function AdminDashboard() {
                         <tr><td colSpan={9} className="p-12 text-center text-gray-700 tracking-widest text-xs uppercase">Henüz kayıt yok.</td></tr>
                     ) : (
                         leads.map((item) => {
-                          const isDropOff = item.package === "FİYAT_ÇIKIŞ";
+                          // SHOPİER Yönlendirmesini yakalayan yeni mantık
+                          const isDropOff = item.package === "FİYAT_ÇIKIŞ" || item.package === "BÜTÇE_YOK_ÇIKIŞ";
+                          const isRedirect = item.package === "PROGRAM_YONLENDIRME";
                           const isIncomplete = item.package === "YARIM_BIRAKTI";
                           
                           let rowClass = 'hover:bg-white/[0.02]';
                           if (isDropOff) rowClass = 'bg-red-900/5 hover:bg-red-900/10';
+                          if (isRedirect) rowClass = 'bg-blue-900/5 hover:bg-blue-900/10';
                           if (isIncomplete) rowClass = 'bg-yellow-900/5 hover:bg-yellow-900/10';
 
                           return (
@@ -465,6 +478,8 @@ function AdminDashboard() {
                                 <td className="py-5 px-6">
                                     {isDropOff ? (
                                         <span className="text-[10px] bg-red-900/30 text-red-500 px-2 py-1 rounded border border-red-900/50 font-bold tracking-wider">KAÇTI</span>
+                                    ) : isRedirect ? (
+                                        <span className="text-[10px] bg-blue-900/30 text-blue-500 px-2 py-1 rounded border border-blue-900/50 font-bold tracking-wider">SHOPİER</span>
                                     ) : isIncomplete ? (
                                         <span className="text-[10px] bg-yellow-900/30 text-yellow-500 px-2 py-1 rounded border border-yellow-900/50 font-bold tracking-wider">YARIM</span>
                                     ) : (
@@ -476,6 +491,8 @@ function AdminDashboard() {
                                 <td className="py-5 px-6">
                                     {isDropOff ? (
                                         <span className="text-red-400/50 text-xs italic">Fiyatı Gördü & Çıktı</span>
+                                    ) : isRedirect ? (
+                                        <span className="text-blue-400/50 text-xs font-bold">Online Programa Gitti</span>
                                     ) : isIncomplete ? (
                                         <span className="text-yellow-400/50 text-xs italic">Formu Tamamlamadı</span>
                                     ) : (
