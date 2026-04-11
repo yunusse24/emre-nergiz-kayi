@@ -38,12 +38,12 @@ const steps: FormStep[] = [
     type: "select", 
     options: [
       "Tek Derslik Bütçe: (Ort. 2.250₺ - 2.750₺)", 
-      "Aylık Bütçe (12 Ders): (Ort. 23.000₺ - 26.500₺)", 
-      "3 Aylık Bütçe (36 Ders): (Ort. 60.000₺ - 70.000₺)",
+      "Aylık Bütçe (12 Ders): (Ort. 20.000₺ - 23.500₺)", 
+      "3 Aylık Bütçe (36 Ders): (Ort. 53.000₺ - 60.000₺)",
       "Şu an bütçe ayırmayı düşünmüyorum, programlarla devam edelim" 
     ], 
     key: "package",
-    note: "📍 Antrenman Yeri: İstanbul Burhan Felek Atletizm Pisti\n\n⚠️ Not: Bu bir fiyat listesi değildir. Hedeflerinize en uygun çalışma programını belirleyebilmemiz için doldurulan tahmini bütçe anketidir. \n\n⚖️ Yasal Bilgilendirme: Bu bir satış sayfası değildir, ön görüşme ve profil analiz anketidir. Web sitemiz üzerinden hiçbir ödeme veya tahsilat yapılmamaktadır. Seçim yaparak, KVKK kapsamında iletişim bilgilerinizin sadece size ulaşabilmemiz amacıyla işlenmesine onay vermiş olursunuz."
+    note: "📍 Antrenman Yeri: İstanbul Burhan Felek Atletizm Pisti\n\n⚠️ Not: Bu bir fiyat listesi değildir. Hedeflerinize en uygun çalışma programını belirleyebilmemiz için doldurulan tahmini bütçe anketidir. Burhan Felek tesis ücreti dersil 250tl'dir \n\n⚖️ Yasal Bilgilendirme: Bu bir satış sayfası değildir, ön görüşme ve profil analiz anketidir. Web sitemiz üzerinden hiçbir ödeme veya tahsilat yapılmamaktadır. Seçim yaparak, KVKK kapsamında iletişim bilgilerinizin sadece size ulaşabilmemiz amacıyla işlenmesine onay vermiş olursunuz."
   },
 ];
 
