@@ -43,7 +43,8 @@ const steps: FormStep[] = [
       "Şu an bütçe ayırmayı düşünmüyorum, programlarla devam edelim" 
     ], 
     key: "package",
-    note: "📍 Antrenman Yeri: İstanbul Burhan Felek Atletizm Pisti\n\n⚠️ Dikkat: Paketlerin 5 hafta içerisinde bitirilmesi zorunludur. Aksi takdirde antrenman bilimi gereği gelişim %40 düşer."},
+    note: "📍 Antrenman Yeri: İstanbul Burhan Felek Atletizm Pisti\n\n⚠️ Dikkat: Paketlerin 5 hafta içerisinde bitirilmesi zorunludur. Aksi takdirde antrenman bilimi gereği gelişim %40 düşer."
+  },
 ];
 
 // --- LOGO BİLEŞENİ ---
@@ -306,10 +307,10 @@ function TypeformView({ onExit }: { onExit: () => void }) {
                     <span className="flex items-center gap-3 text-gray-300 text-sm md:text-lg font-light tracking-wide group-hover:text-white transition-colors pr-8">
                       <span>{opt}</span>
                       
-                      {/* ÜZERİ ÇİZİLİ FİYATLAR (EMRE NERGİZ SİSTEMİ) */}
-                      {opt === "Tek Ders: 2500₺" && (
+                      {/* ÜZERİ ÇİZİLİ FİYATLAR (DÜZELTİLDİ) */}
+                      {opt === "Tek ders: 2.500₺" && (
                         <span className="text-neutral-500/60 line-through decoration-neutral-500/50 decoration-2 text-sm md:text-base font-medium">
-                          3000₺
+                          3.000₺
                         </span>
                       )}
                       {opt === "10 Ders: 22.500₺" && (
@@ -332,8 +333,8 @@ function TypeformView({ onExit }: { onExit: () => void }) {
               <div className="flex flex-col gap-4 w-full">
                 {!contactMethod ? (
                   <>
-                    <button onClick={() => setContactMethod("phone")} className="group w-full p-5 bg-white/[0.03] border border-white/[0.05] rounded-2xl text-left text-gray-300">📱 Telefon Numarası Bırak</button>
-                    <button onClick={() => setContactMethod("instagram")} className="group w-full p-5 bg-white/[0.03] border border-white/[0.05] rounded-2xl text-left text-gray-300">📸 Instagram Adresi Bırak</button>
+                    <button onClick={() => setContactMethod("phone")} className="group w-full p-5 bg-white/[0.03] border border-white/[0.05] rounded-2xl text-left text-gray-300 hover:border-white/20 transition-all">📱 Telefon Numarası Bırak</button>
+                    <button onClick={() => setContactMethod("instagram")} className="group w-full p-5 bg-white/[0.03] border border-white/[0.05] rounded-2xl text-left text-gray-300 hover:border-white/20 transition-all">📸 Instagram Adresi Bırak</button>
                   </>
                 ) : (
                   <div>
@@ -341,7 +342,7 @@ function TypeformView({ onExit }: { onExit: () => void }) {
                       value={formData[contactMethod] || ""} onChange={(e) => setFormData({ ...formData, [contactMethod]: e.target.value, [contactMethod === "phone" ? "instagram" : "phone"]: null })}
                       onBlur={() => saveProgress(formData)}
                       className="w-full bg-transparent border-b border-white/10 pb-4 text-2xl md:text-4xl text-white focus:outline-none placeholder:text-white/10 font-light" />
-                    <button onClick={() => { setContactMethod(null); setFormData({...formData, phone: null, instagram: null}); }} className="mt-4 text-xs text-neutral-500">← Diğer seçenek</button>
+                    <button onClick={() => { setContactMethod(null); setFormData({...formData, phone: null, instagram: null}); }} className="mt-4 text-xs text-neutral-500 hover:text-white transition-all">← Diğer seçenek</button>
                   </div>
                 )}
               </div>
@@ -355,19 +356,20 @@ function TypeformView({ onExit }: { onExit: () => void }) {
             )}
             {question.note && <div className="mt-6 p-4 md:p-5 bg-red-950/20 border border-red-900/30 rounded-xl"><p className="text-red-400/90 text-xs md:text-sm whitespace-pre-wrap">{question.note}</p></div>}
           </div>
-          {question.type !== "select" && <button onClick={handleNext} disabled={isNextDisabled} className="w-full md:w-auto self-start px-8 py-4 rounded-full bg-white text-black font-bold shadow-2xl">Devam Et →</button>}
+          {question.type !== "select" && <button onClick={handleNext} disabled={isNextDisabled} className="w-full md:w-auto self-start px-8 py-4 rounded-full bg-white text-black font-bold shadow-2xl hover:bg-neutral-200 transition-all disabled:opacity-0 disabled:translate-y-4">Devam Et →</button>}
         </div>
       )}
     </div>
   );
 }
 
-// --- ADMIN PANELİ ---
+// --- ADMIN PANELİ (SİLME ÖZELLİKLİ) ---
 function AdminDashboard() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => { fetchLeads(); }, []);
+
   const fetchLeads = async () => {
     setLoading(true);
     const { data } = await supabase.from('leads').select('*').order('created_at', { ascending: false });
@@ -375,33 +377,56 @@ function AdminDashboard() {
     setLoading(false);
   };
 
+  // YENİ: Admin panelinden kayıt silme işlemi
+  const deleteLead = async (id: number) => {
+    if (!window.confirm("Bu kaydı silmek istediğine emin misin?")) return;
+    
+    const { error } = await supabase.from('leads').delete().eq('id', id);
+    if (error) {
+        alert("Silme hatası oluştu: " + error.message);
+    } else {
+        setLeads(leads.filter(lead => lead.id !== id));
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#050505] p-4 md:p-10 text-gray-400 pb-24"> 
       <div className="max-w-[1400px] mx-auto flex justify-between mb-8 border-b border-white/5 pb-6">
         <BrandLogo />
-        <button onClick={() => { localStorage.removeItem("emre_admin_auth"); window.location.reload(); }} className="text-xs border border-red-900/50 px-4 py-2 rounded bg-red-900/10 text-red-500">Çıkış Yap</button>
+        <div className="flex gap-2">
+            <button onClick={fetchLeads} className="text-xs border border-white/10 px-4 py-2 rounded bg-white/[0.02] hover:bg-white/5 text-gray-300 transition-all">Yenile ↻</button>
+            <button onClick={() => { localStorage.removeItem("emre_admin_auth"); window.location.reload(); }} className="text-xs border border-red-900/50 px-4 py-2 rounded bg-red-900/10 text-red-500 hover:bg-red-900/30 transition-all">Çıkış Yap</button>
+        </div>
       </div>
       <div className="max-w-[1400px] mx-auto overflow-hidden rounded-2xl border border-white/5 bg-[#0a0a0a]">
-        <table className="w-full text-left text-sm">
-          <thead>
-            <tr className="bg-[#0f0f0f] text-gray-500 text-[10px] uppercase tracking-widest border-b border-white/5">
-              <th className="py-5 px-6">Durum</th>
-              <th className="py-5 px-6">İsim</th>
-              <th className="py-5 px-6">Paket</th>
-              <th className="py-5 px-6">İletişim</th>
-            </tr>
-          </thead>
-          <tbody>
-            {leads.map((item) => (
-              <tr key={item.id} className="border-b border-white/5 hover:bg-white/[0.02]">
-                <td className="py-5 px-6">{item.package === "FİYAT_ÇIKIŞ" || item.package === "YARIM_BIRAKTI" ? <span className="text-red-500 font-bold">KAYIP</span> : <span className="text-green-500 font-bold">ADAY</span>}</td>
-                <td className="py-5 px-6 font-medium text-gray-200">{item.name}</td>
-                <td className="py-5 px-6">{item.package || "-"}</td>
-                <td className="py-5 px-6 font-mono text-xs">{item.phone ? `📱 ${item.phone}` : `📸 @${item.instagram}`}</td>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="bg-[#0f0f0f] text-gray-500 text-[10px] uppercase tracking-widest border-b border-white/5">
+                <th className="py-5 px-6">Durum</th>
+                <th className="py-5 px-6">İsim</th>
+                <th className="py-5 px-6">Paket</th>
+                <th className="py-5 px-6">İletişim</th>
+                <th className="py-5 px-6 text-center">Sil</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr><td colSpan={5} className="p-10 text-center animate-pulse">Yükleniyor...</td></tr>
+              ) : leads.map((item) => (
+                <tr key={item.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                  <td className="py-5 px-6">{item.package === "FİYAT_ÇIKIŞ" || item.package === "YARIM_BIRAKTI" ? <span className="text-red-500 font-bold text-[10px]">KAYIP</span> : <span className="text-green-500 font-bold text-[10px]">ADAY</span>}</td>
+                  <td className="py-5 px-6 font-medium text-gray-200">{item.name}</td>
+                  <td className="py-5 px-6">{item.package || "-"}</td>
+                  <td className="py-5 px-6 font-mono text-xs">{item.phone ? `📱 ${item.phone}` : item.instagram ? `📸 @${item.instagram}` : "-"}</td>
+                  <td className="py-5 px-6 text-center">
+                    <button onClick={() => deleteLead(item.id)} className="text-red-900 hover:text-red-500 font-bold text-xl px-2 transition-colors" title="Sil">×</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
