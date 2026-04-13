@@ -37,9 +37,9 @@ const steps: FormStep[] = [
     question: "Atletik gelişimin için planladığın tahmini bütçe aralığı nedir?", 
     type: "select", 
     options: [
-      "Tek Derslik Bütçe: (Ort. 2.250₺ - 2.750₺)", 
-      "Aylık Bütçe (12 Ders): (Ort. 20.000₺ - 23.500₺)", 
-      "3 Aylık Bütçe (36 Ders): (Ort. 53.000₺ - 60.000₺)",
+      "Tek ders: 2.500₺", 
+      "10 Ders: 22.500₺", 
+      "15 Ders: 27.500₺",
       "Şu an bütçe ayırmayı düşünmüyorum, programlarla devam edelim" 
     ], 
     key: "package",
@@ -308,14 +308,19 @@ function TypeformView({ onExit }: { onExit: () => void }) {
                       <span>{opt}</span>
                       
                       {/* ÜZERİ ÇİZİLİ FİYATLAR (EMRE NERGİZ SİSTEMİ) */}
-                      {opt === "Aylık Bütçe (12 Ders): (Ort. 20.000₺ - 23.500₺)" && (
+                      {opt === "Tek Ders: 2500₺" && (
                         <span className="text-neutral-500/60 line-through decoration-neutral-500/50 decoration-2 text-sm md:text-base font-medium">
-                          27.000₺
+                          3000₺
                         </span>
                       )}
-                      {opt === "3 Aylık Bütçe (36 Ders): (Ort. 53.000₺ - 60.000₺)" && (
+                      {opt === "10 Ders: 22.500₺" && (
                         <span className="text-neutral-500/60 line-through decoration-neutral-500/50 decoration-2 text-sm md:text-base font-medium">
-                          81.000₺
+                          25.000₺
+                        </span>
+                      )}
+                      {opt === "15 Ders: 27.500₺" && (
+                        <span className="text-neutral-500/60 line-through decoration-neutral-500/50 decoration-2 text-sm md:text-base font-medium">
+                          30.000₺
                         </span>
                       )}
                     </span>
