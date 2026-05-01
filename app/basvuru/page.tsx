@@ -26,12 +26,12 @@ type Lead = {
   created_at: string;
 };
 
-// --- SORULAR (YENİ SIRALAMA VE İLETİŞİM ADIMI) ---
+// --- SORULAR ---
 const steps: FormStep[] = [
   { id: 1, question: "Önce tanışalım, ismin nedir?", type: "text", placeholder: "Adın Soyadın...", key: "name" },
   { id: 2, question: "Kaç yaşındasın?", type: "number", placeholder: "Örn: 17", key: "age" },
   { id: 3, question: "Ana hedefin nedir?", type: "text", placeholder: "Örn: Hızlanmak, Profesyonel olmak...", key: "goal" },
-  { id: 4, question: "Sana nasıl ulaşalım?", type: "contact", key: "contact" }, // YENİ: İletişim Seçici
+  { id: 4, question: "Sana nasıl ulaşalım?", type: "contact", key: "contact" },
   { 
     id: 5, 
     question: "Atletik gelişimin için planladığın tahmini bütçe aralığı nedir?", 
@@ -190,42 +190,64 @@ function LoginView({ onSuccess, onCancel }: { onSuccess: () => void, onCancel: (
   );
 }
 
-// --- MÜŞTERİ FORMU (SADECE FİNALDE KAYIT YAPAN SİSTEM) ---
+// --- MÜŞTERİ FORMU (İLETİŞİMDE YAKALAMA SİSTEMİ) ---
 function TypeformView({ onExit }: { onExit: () => void }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<any>({});
   const [isCompleted, setIsCompleted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [contactMethod, setContactMethod] = useState<"phone" | "instagram" | null>(null);
+  
+  // Kullanıcıyı veritabanında güncellemek için ID'sini tutuyoruz
+  const [leadId, setLeadId] = useState<number | null>(null);
 
   const totalSteps = steps.length;
   const progress = ((currentStep + 1) / totalSteps) * 100;
 
   const handleNext = async () => {
-    // Sadece numarayı kontrol et, veritabanına kaydetme
-    if (steps[currentStep].type === 'contact' && contactMethod === 'phone') {
-        const phoneVal = String(formData.phone || "");
-        const cleanPhone = phoneVal.replace(/\D/g, ''); 
-        if (cleanPhone.length < 10 || cleanPhone.length > 11) {
-            alert("⚠️ Geçersiz Numara!\n\nLütfen telefon numaranızı eksiksiz girdiğinizden emin olun.");
-            return; 
+    // 1. Eğer iletişim adımındaysak (Step 4 - index 3), Validasyon ve KAYIT işlemi yap
+    if (steps[currentStep].type === 'contact') {
+        if (contactMethod === 'phone') {
+            const phoneVal = String(formData.phone || "");
+            const cleanPhone = phoneVal.replace(/\D/g, ''); 
+            if (cleanPhone.length < 10 || cleanPhone.length > 11) {
+                alert("⚠️ Geçersiz Numara!\n\nLütfen telefon numaranızı eksiksiz girdiğinizden emin olun.");
+                return; 
+            }
         }
+
+        setIsSubmitting(true);
+        // İletişimi bıraktığı an ilk veritabanı kaydını atıyoruz (Fiyat ekranına geçmeden önce)
+        const payload = {
+            name: formData.name,
+            age: formData.age ? Number(formData.age) : null,
+            phone: formData.phone || null,
+            instagram: formData.instagram || null,
+            goal: formData.goal,
+            package: "İLETİŞİM_BIRAKTI" // Henüz fiyat seçmedi
+        };
+
+        if (!leadId && formData.name && formData.name.length > 2) {
+            const { data, error } = await supabase.from('leads').insert([payload]).select().single();
+            if (!error && data) {
+                setLeadId(data.id); // Oluşan ID'yi hafızaya al ki sonda güncelleyebilelim
+            }
+        }
+        setIsSubmitting(false);
     }
     
-    // Sonraki adıma geç
+    // 2. Sonraki adıma geç
     if (currentStep < totalSteps - 1) {
         setCurrentStep(prev => prev + 1);
     }
   };
 
-  // VERİTABANI KAYDI SADECE BURADA ÇALIŞACAK
   const submitFinalData = async (finalPackageValue: string, actionType: "success" | "dropoff" | "redirect" = "success") => {
     setIsSubmitting(true);
     
     const finalData = { ...formData, package: finalPackageValue }; 
     setFormData(finalData);
 
-    // Tek Seferlik Insert İşlemi
     const payload = {
         name: finalData.name,
         age: finalData.age ? Number(finalData.age) : null,
@@ -235,9 +257,14 @@ function TypeformView({ onExit }: { onExit: () => void }) {
         package: finalPackageValue 
     };
 
-    if (finalData.name && finalData.name.length > 2) {
-        const { error } = await supabase.from('leads').insert([payload]);
-        if (error) console.error("Kayıt Hatası:", error);
+    // Eğer iletişim adımında kayıt açıldıysa onu GÜNCELLE (Çöplük oluşmasın)
+    if (leadId) {
+        await supabase.from('leads').update(payload).eq('id', leadId);
+    } else {
+        // Hızlıca geçilmişse (nadiren olur) yeni kayıt aç
+        if (finalData.name && finalData.name.length > 2) {
+            await supabase.from('leads').insert([payload]);
+        }
     }
 
     const contactInfo = finalData.phone ? `📱 ${finalData.phone}` : `📸 @${finalData.instagram?.replace('@', '')}`;
@@ -297,8 +324,7 @@ function TypeformView({ onExit }: { onExit: () => void }) {
                     key={i} 
                     onClick={() => { 
                       if (opt === "Şu an bütçe ayırmayı düşünmüyorum, programlarla devam edelim") submitFinalData("PROGRAM_YONLENDIRME", "redirect"); 
-                      else if (question.key === 'package') submitFinalData(opt, "success"); 
-                      else { handleChange(opt); setTimeout(handleNext, 150); }
+                      else submitFinalData(opt, "success"); 
                     }} 
                     className="group relative w-full p-5 md:p-6 bg-white/[0.03] border border-white/[0.05] rounded-2xl text-left hover:bg-white/[0.08] hover:border-white/20 active:scale-[0.98] transition-all duration-200"
                   >
@@ -306,19 +332,13 @@ function TypeformView({ onExit }: { onExit: () => void }) {
                       <span>{opt}</span>
                       
                       {opt === "Tek ders: 2.500₺" && (
-                        <span className="text-neutral-500/60 line-through decoration-neutral-500/50 decoration-2 text-sm md:text-base font-medium">
-                          3.000₺
-                        </span>
+                        <span className="text-neutral-500/60 line-through decoration-neutral-500/50 decoration-2 text-sm md:text-base font-medium">3.000₺</span>
                       )}
                       {opt === "10 Ders: 22.500₺" && (
-                        <span className="text-neutral-500/60 line-through decoration-neutral-500/50 decoration-2 text-sm md:text-base font-medium">
-                          25.000₺
-                        </span>
+                        <span className="text-neutral-500/60 line-through decoration-neutral-500/50 decoration-2 text-sm md:text-base font-medium">25.000₺</span>
                       )}
                       {opt === "15 Ders: 27.500₺" && (
-                        <span className="text-neutral-500/60 line-through decoration-neutral-500/50 decoration-2 text-sm md:text-base font-medium">
-                          30.000₺
-                        </span>
+                        <span className="text-neutral-500/60 line-through decoration-neutral-500/50 decoration-2 text-sm md:text-base font-medium">30.000₺</span>
                       )}
                     </span>
                     <span className="absolute right-5 top-1/2 -translate-y-1/2 text-white/20 group-hover:translate-x-1 group-hover:text-white transition-all text-xl">→</span>
@@ -360,7 +380,7 @@ function TypeformView({ onExit }: { onExit: () => void }) {
   );
 }
 
-// --- ADMIN PANELİ (TARİH EKLENDİ) ---
+// --- ADMIN PANELİ (GÜNCELLENDİ: FİYATTA KALANLARI GÖSTERİYOR) ---
 function AdminDashboard() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
@@ -380,7 +400,6 @@ function AdminDashboard() {
     if (!error) setLeads(leads.filter(lead => lead.id !== id));
   };
 
-  // TARİH FORMATLAMA FONKSİYONU
   const formatDate = (dateString: string) => {
     if (!dateString) return "-";
     const date = new Date(dateString);
@@ -408,7 +427,7 @@ function AdminDashboard() {
                 <th className="py-5 px-6">İsim</th>
                 <th className="py-5 px-6">Paket Seçimi</th>
                 <th className="py-5 px-6">İletişim</th>
-                <th className="py-5 px-6">Tarih</th> {/* YENİ: Tarih Sütunu */}
+                <th className="py-5 px-6">Tarih</th>
                 <th className="py-5 px-6 text-center">Sil</th>
               </tr>
             </thead>
@@ -418,19 +437,25 @@ function AdminDashboard() {
               ) : leads.map((item) => {
                 const isDropOff = item.package === "FİYAT_ÇIKIŞ" || item.package === "BÜTÇE_YOK_ÇIKIŞ";
                 const isRedirect = item.package === "PROGRAM_YONLENDIRME";
-                const rowClass = isDropOff ? 'bg-red-900/5' : isRedirect ? 'bg-blue-900/5' : '';
+                const isContactOnly = item.package === "İLETİŞİM_BIRAKTI"; // Yeni Statü
+
+                const rowClass = isDropOff ? 'bg-red-900/5' : isRedirect ? 'bg-blue-900/5' : isContactOnly ? 'bg-yellow-900/5' : '';
 
                 return (
                   <tr key={item.id} className={`border-b border-white/5 transition-colors ${rowClass} hover:bg-white/[0.02]`}>
                     <td className="py-5 px-6">
                         {isDropOff ? <span className="text-[10px] bg-red-900/30 text-red-500 px-2 py-1 rounded border border-red-900/50 font-bold">KAÇTI</span> : 
                          isRedirect ? <span className="text-[10px] bg-blue-900/30 text-blue-500 px-2 py-1 rounded border border-blue-900/50 font-bold">SHOPİER</span> : 
+                         isContactOnly ? <span className="text-[10px] bg-yellow-900/30 text-yellow-500 px-2 py-1 rounded border border-yellow-900/50 font-bold" title="Fiyatları gördü ama paket seçmeden çıktı.">FİYATTA KALDI</span> : 
                          <span className="text-[10px] bg-green-900/30 text-green-500 px-2 py-1 rounded border border-green-900/50 font-bold">ADAY</span>}
                     </td>
                     <td className="py-5 px-6 font-medium text-gray-200">{item.name}</td>
-                    <td className="py-5 px-6">{item.package?.replace("PROGRAM_YONLENDIRME", "SHOPİER") || "-"}</td>
+                    <td className="py-5 px-6">
+                        {isContactOnly ? <span className="text-yellow-500/50 italic text-xs">Paket Seçmedi</span> : 
+                         item.package?.replace("PROGRAM_YONLENDIRME", "SHOPİER") || "-"}
+                    </td>
                     <td className="py-5 px-6 font-mono text-xs">{item.phone ? `📱 ${item.phone}` : item.instagram ? `📸 @${item.instagram}` : "-"}</td>
-                    <td className="py-5 px-6 text-neutral-500 text-xs">{formatDate(item.created_at)}</td> {/* YENİ: Tarih Görüntüleme */}
+                    <td className="py-5 px-6 text-neutral-500 text-xs">{formatDate(item.created_at)}</td>
                     <td className="py-5 px-6 text-center">
                       <button onClick={() => deleteLead(item.id)} className="text-red-900 hover:text-red-500 font-bold text-xl px-2 transition-colors" title="Sil">×</button>
                     </td>
