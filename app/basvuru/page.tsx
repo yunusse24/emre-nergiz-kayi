@@ -190,40 +190,19 @@ function LoginView({ onSuccess, onCancel }: { onSuccess: () => void, onCancel: (
   );
 }
 
-// --- MÜŞTERİ FORMU (ADIM ADIM TAKİP SİSTEMİ) ---
+// --- MÜŞTERİ FORMU (SADECE FİNALDE KAYIT YAPAN SİSTEM) ---
 function TypeformView({ onExit }: { onExit: () => void }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<any>({});
   const [isCompleted, setIsCompleted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [contactMethod, setContactMethod] = useState<"phone" | "instagram" | null>(null);
-  const [leadId, setLeadId] = useState<number | null>(null);
 
   const totalSteps = steps.length;
   const progress = ((currentStep + 1) / totalSteps) * 100;
 
-  const saveProgress = async (newData: any) => {
-    const payload = {
-        name: newData.name,
-        age: newData.age ? Number(newData.age) : null,
-        phone: newData.phone || null,
-        instagram: newData.instagram || null,
-        goal: newData.goal,
-        package: newData.package || "YARIM_BIRAKTI" 
-    };
-
-    if (leadId) {
-        const { error } = await supabase.from('leads').update(payload).eq('id', leadId);
-        if (error) console.error("Update Hatası:", error);
-    } else {
-        if (newData.name && newData.name.length > 2) {
-            const { data, error } = await supabase.from('leads').insert([payload]).select().single();
-            if (!error && data) setLeadId(data.id); 
-        }
-    }
-  };
-
   const handleNext = async () => {
+    // Sadece numarayı kontrol et, veritabanına kaydetme
     if (steps[currentStep].type === 'contact' && contactMethod === 'phone') {
         const phoneVal = String(formData.phone || "");
         const cleanPhone = phoneVal.replace(/\D/g, ''); 
@@ -232,15 +211,34 @@ function TypeformView({ onExit }: { onExit: () => void }) {
             return; 
         }
     }
-    await saveProgress(formData);
-    if (currentStep < totalSteps - 1) setCurrentStep(prev => prev + 1);
+    
+    // Sonraki adıma geç
+    if (currentStep < totalSteps - 1) {
+        setCurrentStep(prev => prev + 1);
+    }
   };
 
+  // VERİTABANI KAYDI SADECE BURADA ÇALIŞACAK
   const submitFinalData = async (finalPackageValue: string, actionType: "success" | "dropoff" | "redirect" = "success") => {
     setIsSubmitting(true);
+    
     const finalData = { ...formData, package: finalPackageValue }; 
     setFormData(finalData);
-    await saveProgress(finalData);
+
+    // Tek Seferlik Insert İşlemi
+    const payload = {
+        name: finalData.name,
+        age: finalData.age ? Number(finalData.age) : null,
+        phone: finalData.phone || null,
+        instagram: finalData.instagram || null,
+        goal: finalData.goal,
+        package: finalPackageValue 
+    };
+
+    if (finalData.name && finalData.name.length > 2) {
+        const { error } = await supabase.from('leads').insert([payload]);
+        if (error) console.error("Kayıt Hatası:", error);
+    }
 
     const contactInfo = finalData.phone ? `📱 ${finalData.phone}` : `📸 @${finalData.instagram?.replace('@', '')}`;
 
@@ -307,7 +305,6 @@ function TypeformView({ onExit }: { onExit: () => void }) {
                     <span className="flex items-center gap-3 text-gray-300 text-sm md:text-lg font-light tracking-wide group-hover:text-white transition-colors pr-8">
                       <span>{opt}</span>
                       
-                      {/* ÜZERİ ÇİZİLİ FİYATLAR (DÜZELTİLDİ) */}
                       {opt === "Tek ders: 2.500₺" && (
                         <span className="text-neutral-500/60 line-through decoration-neutral-500/50 decoration-2 text-sm md:text-base font-medium">
                           3.000₺
@@ -337,19 +334,19 @@ function TypeformView({ onExit }: { onExit: () => void }) {
                     <button onClick={() => setContactMethod("instagram")} className="group w-full p-5 bg-white/[0.03] border border-white/[0.05] rounded-2xl text-left text-gray-300 hover:border-white/20 transition-all">📸 Instagram Adresi Bırak</button>
                   </>
                 ) : (
-                  <div>
+                  <div className="animate-in fade-in duration-300">
                     <input autoFocus type={contactMethod === "phone" ? "tel" : "text"} placeholder={contactMethod === "phone" ? "05XX XXX XX XX" : "@kullaniciadi"} 
                       value={formData[contactMethod] || ""} onChange={(e) => setFormData({ ...formData, [contactMethod]: e.target.value, [contactMethod === "phone" ? "instagram" : "phone"]: null })}
-                      onBlur={() => saveProgress(formData)}
+                      onKeyDown={(e) => { if (e.key === "Enter" && formData[contactMethod]) handleNext(); }}
                       className="w-full bg-transparent border-b border-white/10 pb-4 text-2xl md:text-4xl text-white focus:outline-none placeholder:text-white/10 font-light" />
-                    <button onClick={() => { setContactMethod(null); setFormData({...formData, phone: null, instagram: null}); }} className="mt-4 text-xs text-neutral-500 hover:text-white transition-all">← Diğer seçenek</button>
+                    <button onClick={() => { setContactMethod(null); setFormData({...formData, phone: null, instagram: null}); }} className="mt-4 text-xs text-neutral-500 hover:text-white transition-all">← Diğer seçeneğe dön</button>
                   </div>
                 )}
               </div>
             ) 
             : (
               <input autoFocus type={question.type} placeholder={question.placeholder} value={formData[question.key] || ""}
-                onChange={(e) => handleChange(e.target.value)} onBlur={() => saveProgress(formData)}
+                onChange={(e) => handleChange(e.target.value)} 
                 onKeyDown={(e) => { if (e.key === "Enter" && formData[question.key] && currentStep < totalSteps - 1) handleNext(); }}
                 className="w-full bg-transparent border-b border-white/10 pb-4 text-2xl md:text-4xl text-white focus:outline-none font-light tracking-wide"
               />
@@ -363,7 +360,7 @@ function TypeformView({ onExit }: { onExit: () => void }) {
   );
 }
 
-// --- ADMIN PANELİ (SİLME ÖZELLİKLİ) ---
+// --- ADMIN PANELİ (TARİH EKLENDİ) ---
 function AdminDashboard() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
@@ -377,24 +374,28 @@ function AdminDashboard() {
     setLoading(false);
   };
 
-  // YENİ: Admin panelinden kayıt silme işlemi
   const deleteLead = async (id: number) => {
     if (!window.confirm("Bu kaydı silmek istediğine emin misin?")) return;
-    
     const { error } = await supabase.from('leads').delete().eq('id', id);
-    if (error) {
-        alert("Silme hatası oluştu: " + error.message);
-    } else {
-        setLeads(leads.filter(lead => lead.id !== id));
-    }
+    if (!error) setLeads(leads.filter(lead => lead.id !== id));
+  };
+
+  // TARİH FORMATLAMA FONKSİYONU
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "-";
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('tr-TR', { 
+        day: '2-digit', month: '2-digit', year: 'numeric', 
+        hour: '2-digit', minute: '2-digit' 
+    }).format(date);
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] p-4 md:p-10 text-gray-400 pb-24"> 
+    <div className="min-h-screen bg-[#050505] p-4 md:p-10 font-sans text-gray-400 pb-24"> 
       <div className="max-w-[1400px] mx-auto flex justify-between mb-8 border-b border-white/5 pb-6">
         <BrandLogo />
         <div className="flex gap-2">
-            <button onClick={fetchLeads} className="text-xs border border-white/10 px-4 py-2 rounded bg-white/[0.02] hover:bg-white/5 text-gray-300 transition-all">Yenile ↻</button>
+            <button onClick={fetchLeads} className="text-xs border border-white/10 px-4 py-2 rounded bg-white/[0.02] hover:bg-white/5 transition-all text-gray-300">Yenile ↻</button>
             <button onClick={() => { localStorage.removeItem("emre_admin_auth"); window.location.reload(); }} className="text-xs border border-red-900/50 px-4 py-2 rounded bg-red-900/10 text-red-500 hover:bg-red-900/30 transition-all">Çıkış Yap</button>
         </div>
       </div>
@@ -405,25 +406,37 @@ function AdminDashboard() {
               <tr className="bg-[#0f0f0f] text-gray-500 text-[10px] uppercase tracking-widest border-b border-white/5">
                 <th className="py-5 px-6">Durum</th>
                 <th className="py-5 px-6">İsim</th>
-                <th className="py-5 px-6">Paket</th>
+                <th className="py-5 px-6">Paket Seçimi</th>
                 <th className="py-5 px-6">İletişim</th>
+                <th className="py-5 px-6">Tarih</th> {/* YENİ: Tarih Sütunu */}
                 <th className="py-5 px-6 text-center">Sil</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={5} className="p-10 text-center animate-pulse">Yükleniyor...</td></tr>
-              ) : leads.map((item) => (
-                <tr key={item.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
-                  <td className="py-5 px-6">{item.package === "FİYAT_ÇIKIŞ" || item.package === "YARIM_BIRAKTI" ? <span className="text-red-500 font-bold text-[10px]">KAYIP</span> : <span className="text-green-500 font-bold text-[10px]">ADAY</span>}</td>
-                  <td className="py-5 px-6 font-medium text-gray-200">{item.name}</td>
-                  <td className="py-5 px-6">{item.package || "-"}</td>
-                  <td className="py-5 px-6 font-mono text-xs">{item.phone ? `📱 ${item.phone}` : item.instagram ? `📸 @${item.instagram}` : "-"}</td>
-                  <td className="py-5 px-6 text-center">
-                    <button onClick={() => deleteLead(item.id)} className="text-red-900 hover:text-red-500 font-bold text-xl px-2 transition-colors" title="Sil">×</button>
-                  </td>
-                </tr>
-              ))}
+                <tr><td colSpan={6} className="p-10 text-center animate-pulse">Yükleniyor...</td></tr>
+              ) : leads.map((item) => {
+                const isDropOff = item.package === "FİYAT_ÇIKIŞ" || item.package === "BÜTÇE_YOK_ÇIKIŞ";
+                const isRedirect = item.package === "PROGRAM_YONLENDIRME";
+                const rowClass = isDropOff ? 'bg-red-900/5' : isRedirect ? 'bg-blue-900/5' : '';
+
+                return (
+                  <tr key={item.id} className={`border-b border-white/5 transition-colors ${rowClass} hover:bg-white/[0.02]`}>
+                    <td className="py-5 px-6">
+                        {isDropOff ? <span className="text-[10px] bg-red-900/30 text-red-500 px-2 py-1 rounded border border-red-900/50 font-bold">KAÇTI</span> : 
+                         isRedirect ? <span className="text-[10px] bg-blue-900/30 text-blue-500 px-2 py-1 rounded border border-blue-900/50 font-bold">SHOPİER</span> : 
+                         <span className="text-[10px] bg-green-900/30 text-green-500 px-2 py-1 rounded border border-green-900/50 font-bold">ADAY</span>}
+                    </td>
+                    <td className="py-5 px-6 font-medium text-gray-200">{item.name}</td>
+                    <td className="py-5 px-6">{item.package?.replace("PROGRAM_YONLENDIRME", "SHOPİER") || "-"}</td>
+                    <td className="py-5 px-6 font-mono text-xs">{item.phone ? `📱 ${item.phone}` : item.instagram ? `📸 @${item.instagram}` : "-"}</td>
+                    <td className="py-5 px-6 text-neutral-500 text-xs">{formatDate(item.created_at)}</td> {/* YENİ: Tarih Görüntüleme */}
+                    <td className="py-5 px-6 text-center">
+                      <button onClick={() => deleteLead(item.id)} className="text-red-900 hover:text-red-500 font-bold text-xl px-2 transition-colors" title="Sil">×</button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
