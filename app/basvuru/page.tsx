@@ -19,7 +19,7 @@ type Lead = {
   id: number;
   name: string;
   age: number;
-  city?: string | null; // YENİ: Şehir bilgisi
+  city?: string | null;
   package: string | null;
   goal: string;
   phone: string | null;
@@ -198,7 +198,7 @@ function LoginView({ onSuccess, onCancel }: { onSuccess: () => void, onCancel: (
   );
 }
 
-// --- MÜŞTERİ FORMU ---
+// --- MÜŞTERİ FORMU (DÜZELTİLMİŞ YAKALAMA SİSTEMİ) ---
 function TypeformView({ onExit }: { onExit: () => void }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<any>({});
@@ -212,6 +212,7 @@ function TypeformView({ onExit }: { onExit: () => void }) {
   const progress = ((currentStep + 1) / totalSteps) * 100;
 
   const handleNext = async () => {
+    // 1. İletişim Adımı (Veritabanı İlk Kayıt)
     if (steps[currentStep].type === 'contact') {
         if (contactMethod === 'phone') {
             const phoneVal = String(formData.phone || "");
@@ -223,7 +224,6 @@ function TypeformView({ onExit }: { onExit: () => void }) {
         }
 
         setIsSubmitting(true);
-        // İletişimi bıraktığı an ilk veritabanı kaydını atıyoruz (Şehir ve Fiyat ekranına geçmeden önce)
         const payload = {
             name: formData.name,
             age: formData.age ? Number(formData.age) : null,
@@ -256,7 +256,7 @@ function TypeformView({ onExit }: { onExit: () => void }) {
     const payload = {
         name: finalData.name,
         age: finalData.age ? Number(finalData.age) : null,
-        city: finalData.city || null, // Şehir bilgisi eklendi
+        city: finalData.city || null,
         phone: finalData.phone || null,
         instagram: finalData.instagram || null,
         goal: finalData.goal,
@@ -327,15 +327,26 @@ function TypeformView({ onExit }: { onExit: () => void }) {
                 {question.options?.map((opt, i) => (
                   <button 
                     key={i} 
-                    onClick={() => { 
+                    onClick={async () => { 
                       if (question.key === "package") {
-                          // BÜTÇE (FİYAT) SEÇİMİ
                           if (opt === "Şu an bütçe ayırmayı düşünmüyorum, programlarla devam edelim") submitFinalData("PROGRAM_YONLENDIRME", "redirect"); 
                           else submitFinalData(opt, "success"); 
-                      } else {
-                          // ŞEHİR SEÇİMİ
-                          handleChange(opt); 
-                          setTimeout(handleNext, 150); 
+                      } else if (question.key === "city") {
+                          // ŞEHİR SEÇİMİ VE VERİTABANI GÜNCELLEMESİ
+                          const newFormData = { ...formData, city: opt };
+                          setFormData(newFormData);
+
+                          if (leadId) {
+                              // Şehir seçildiği an, veri tabanına hem şehri yaz hem de durumu "FİYATTA KALDI" yap
+                              await supabase.from('leads').update({
+                                  city: opt,
+                                  package: "FİYATTA KALDI"
+                              }).eq('id', leadId);
+                          }
+
+                          setTimeout(() => {
+                              if (currentStep < totalSteps - 1) setCurrentStep(prev => prev + 1);
+                          }, 150);
                       }
                     }} 
                     className="group relative w-full p-5 md:p-6 bg-white/[0.03] border border-white/[0.05] rounded-2xl text-left hover:bg-white/[0.08] hover:border-white/20 active:scale-[0.98] transition-all duration-200"
@@ -387,7 +398,7 @@ function TypeformView({ onExit }: { onExit: () => void }) {
   );
 }
 
-// --- ADMIN PANELİ (ŞEHİR SÜTUNU EKLENDİ) ---
+// --- ADMIN PANELİ ---
 function AdminDashboard() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
@@ -432,7 +443,7 @@ function AdminDashboard() {
               <tr className="bg-[#0f0f0f] text-gray-500 text-[10px] uppercase tracking-widest border-b border-white/5">
                 <th className="py-5 px-6">Durum</th>
                 <th className="py-5 px-6">İsim</th>
-                <th className="py-5 px-6">Şehir</th> {/* YENİ */}
+                <th className="py-5 px-6">Şehir</th>
                 <th className="py-5 px-6">Paket Seçimi</th>
                 <th className="py-5 px-6">İletişim</th>
                 <th className="py-5 px-6">Tarih</th>
@@ -445,7 +456,7 @@ function AdminDashboard() {
               ) : leads.map((item) => {
                 const isDropOff = item.package === "FİYAT_ÇIKIŞ" || item.package === "BÜTÇE_YOK_ÇIKIŞ";
                 const isRedirect = item.package === "PROGRAM_YONLENDIRME";
-                const isContactOnly = item.package === "İLETİŞİM_BIRAKTI"; 
+                const isContactOnly = item.package === "İLETİŞİM_BIRAKTI" || item.package === "FİYATTA KALDI";
 
                 const rowClass = isDropOff ? 'bg-red-900/5' : isRedirect ? 'bg-blue-900/5' : isContactOnly ? 'bg-yellow-900/5' : '';
 
@@ -454,11 +465,11 @@ function AdminDashboard() {
                     <td className="py-5 px-6">
                         {isDropOff ? <span className="text-[10px] bg-red-900/30 text-red-500 px-2 py-1 rounded border border-red-900/50 font-bold">KAÇTI</span> : 
                          isRedirect ? <span className="text-[10px] bg-blue-900/30 text-blue-500 px-2 py-1 rounded border border-blue-900/50 font-bold">SHOPİER</span> : 
-                         isContactOnly ? <span className="text-[10px] bg-yellow-900/30 text-yellow-500 px-2 py-1 rounded border border-yellow-900/50 font-bold" title="Fiyatları gördü ama paket seçmeden çıktı.">FİYATTA KALDI</span> : 
+                         isContactOnly ? <span className="text-[10px] bg-yellow-900/30 text-yellow-500 px-2 py-1 rounded border border-yellow-900/50 font-bold" title="İletişimi bıraktı, satışa dönülebilir.">FİYATTA KALDI</span> : 
                          <span className="text-[10px] bg-green-900/30 text-green-500 px-2 py-1 rounded border border-green-900/50 font-bold">ADAY</span>}
                     </td>
                     <td className="py-5 px-6 font-medium text-gray-200">{item.name}</td>
-                    <td className="py-5 px-6 text-gray-300">{item.city || "-"}</td> {/* YENİ */}
+                    <td className="py-5 px-6 text-gray-300">{item.city || "-"}</td>
                     <td className="py-5 px-6">
                         {isContactOnly ? <span className="text-yellow-500/50 italic text-xs">Paket Seçmedi</span> : 
                          item.package?.replace("PROGRAM_YONLENDIRME", "SHOPİER") || "-"}
