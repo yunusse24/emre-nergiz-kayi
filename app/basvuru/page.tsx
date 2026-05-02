@@ -37,7 +37,7 @@ const steps: FormStep[] = [
     question: "Atletik gelişimin için planladığın tahmini bütçe aralığı nedir?", 
     type: "select", 
     options: [
-      "Tek ders: 2.500₺", 
+      "Tek ders: 3.000₺", 
       "10 Ders: 27.500₺", 
       "15 Ders: 33.500₺",
       "Şu an bütçe ayırmayı düşünmüyorum, programlarla devam edelim" 
@@ -331,8 +331,8 @@ function TypeformView({ onExit }: { onExit: () => void }) {
                     <span className="flex items-center gap-3 text-gray-300 text-sm md:text-lg font-light tracking-wide group-hover:text-white transition-colors pr-8">
                       <span>{opt}</span>
                       
-                      {opt === "Tek ders: 2.500₺" && (
-                        <span className="text-neutral-500/60 line-through decoration-neutral-500/50 decoration-2 text-sm md:text-base font-medium">3.000₺</span>
+                      {opt === "Tek ders: 3.000₺" && (
+                        <span className="text-neutral-500/60 line-through decoration-neutral-500/50 decoration-2 text-sm md:text-base font-medium">3.500₺</span>
                       )}
                       {opt === "10 Ders: 27.500₺" && (
                         <span className="text-neutral-500/60 line-through decoration-neutral-500/50 decoration-2 text-sm md:text-base font-medium">30.000₺</span>
