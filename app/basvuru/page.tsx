@@ -38,8 +38,8 @@ const steps: FormStep[] = [
     type: "select", 
     options: [
       "Tek ders: 2.500₺", 
-      "10 Ders: 22.500₺", 
-      "15 Ders: 27.500₺",
+      "10 Ders: 27.500₺", 
+      "15 Ders: 33.500₺",
       "Şu an bütçe ayırmayı düşünmüyorum, programlarla devam edelim" 
     ], 
     key: "package",
@@ -334,11 +334,11 @@ function TypeformView({ onExit }: { onExit: () => void }) {
                       {opt === "Tek ders: 2.500₺" && (
                         <span className="text-neutral-500/60 line-through decoration-neutral-500/50 decoration-2 text-sm md:text-base font-medium">3.000₺</span>
                       )}
-                      {opt === "10 Ders: 22.500₺" && (
-                        <span className="text-neutral-500/60 line-through decoration-neutral-500/50 decoration-2 text-sm md:text-base font-medium">25.000₺</span>
-                      )}
-                      {opt === "15 Ders: 27.500₺" && (
+                      {opt === "10 Ders: 27.500₺" && (
                         <span className="text-neutral-500/60 line-through decoration-neutral-500/50 decoration-2 text-sm md:text-base font-medium">30.000₺</span>
+                      )}
+                      {opt === "15 Ders: 33.500₺" && (
+                        <span className="text-neutral-500/60 line-through decoration-neutral-500/50 decoration-2 text-sm md:text-base font-medium">35.000₺</span>
                       )}
                     </span>
                     <span className="absolute right-5 top-1/2 -translate-y-1/2 text-white/20 group-hover:translate-x-1 group-hover:text-white transition-all text-xl">→</span>
