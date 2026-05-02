@@ -19,6 +19,7 @@ type Lead = {
   id: number;
   name: string;
   age: number;
+  city?: string | null; // YENİ: Şehir bilgisi
   package: string | null;
   goal: string;
   phone: string | null;
@@ -26,7 +27,7 @@ type Lead = {
   created_at: string;
 };
 
-// --- SORULAR ---
+// --- SORULAR (ŞEHİR ADIMI EKLENDİ) ---
 const steps: FormStep[] = [
   { id: 1, question: "Önce tanışalım, ismin nedir?", type: "text", placeholder: "Adın Soyadın...", key: "name" },
   { id: 2, question: "Kaç yaşındasın?", type: "number", placeholder: "Örn: 17", key: "age" },
@@ -34,6 +35,13 @@ const steps: FormStep[] = [
   { id: 4, question: "Sana nasıl ulaşalım?", type: "contact", key: "contact" },
   { 
     id: 5, 
+    question: "Hangi şehirdesin?", 
+    type: "select", 
+    options: ["İstanbul", "Diğer"], 
+    key: "city" 
+  },
+  { 
+    id: 6, 
     question: "Atletik gelişimin için planladığın tahmini bütçe aralığı nedir?", 
     type: "select", 
     options: [
@@ -190,7 +198,7 @@ function LoginView({ onSuccess, onCancel }: { onSuccess: () => void, onCancel: (
   );
 }
 
-// --- MÜŞTERİ FORMU (İLETİŞİMDE YAKALAMA SİSTEMİ) ---
+// --- MÜŞTERİ FORMU ---
 function TypeformView({ onExit }: { onExit: () => void }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<any>({});
@@ -198,14 +206,12 @@ function TypeformView({ onExit }: { onExit: () => void }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [contactMethod, setContactMethod] = useState<"phone" | "instagram" | null>(null);
   
-  // Kullanıcıyı veritabanında güncellemek için ID'sini tutuyoruz
   const [leadId, setLeadId] = useState<number | null>(null);
 
   const totalSteps = steps.length;
   const progress = ((currentStep + 1) / totalSteps) * 100;
 
   const handleNext = async () => {
-    // 1. Eğer iletişim adımındaysak (Step 4 - index 3), Validasyon ve KAYIT işlemi yap
     if (steps[currentStep].type === 'contact') {
         if (contactMethod === 'phone') {
             const phoneVal = String(formData.phone || "");
@@ -217,26 +223,25 @@ function TypeformView({ onExit }: { onExit: () => void }) {
         }
 
         setIsSubmitting(true);
-        // İletişimi bıraktığı an ilk veritabanı kaydını atıyoruz (Fiyat ekranına geçmeden önce)
+        // İletişimi bıraktığı an ilk veritabanı kaydını atıyoruz (Şehir ve Fiyat ekranına geçmeden önce)
         const payload = {
             name: formData.name,
             age: formData.age ? Number(formData.age) : null,
             phone: formData.phone || null,
             instagram: formData.instagram || null,
             goal: formData.goal,
-            package: "İLETİŞİM_BIRAKTI" // Henüz fiyat seçmedi
+            package: "İLETİŞİM_BIRAKTI" 
         };
 
         if (!leadId && formData.name && formData.name.length > 2) {
             const { data, error } = await supabase.from('leads').insert([payload]).select().single();
             if (!error && data) {
-                setLeadId(data.id); // Oluşan ID'yi hafızaya al ki sonda güncelleyebilelim
+                setLeadId(data.id); 
             }
         }
         setIsSubmitting(false);
     }
     
-    // 2. Sonraki adıma geç
     if (currentStep < totalSteps - 1) {
         setCurrentStep(prev => prev + 1);
     }
@@ -251,32 +256,32 @@ function TypeformView({ onExit }: { onExit: () => void }) {
     const payload = {
         name: finalData.name,
         age: finalData.age ? Number(finalData.age) : null,
+        city: finalData.city || null, // Şehir bilgisi eklendi
         phone: finalData.phone || null,
         instagram: finalData.instagram || null,
         goal: finalData.goal,
         package: finalPackageValue 
     };
 
-    // Eğer iletişim adımında kayıt açıldıysa onu GÜNCELLE (Çöplük oluşmasın)
     if (leadId) {
         await supabase.from('leads').update(payload).eq('id', leadId);
     } else {
-        // Hızlıca geçilmişse (nadiren olur) yeni kayıt aç
         if (finalData.name && finalData.name.length > 2) {
             await supabase.from('leads').insert([payload]);
         }
     }
 
     const contactInfo = finalData.phone ? `📱 ${finalData.phone}` : `📸 @${finalData.instagram?.replace('@', '')}`;
+    const cityInfo = finalData.city ? `🏙️ Şehir: ${finalData.city}` : "";
 
     try {
         let message = "";
         if (actionType === "dropoff") {
-            message = `📉 <b>BÜTÇE REDDİ (KAYIP)</b>\n👤 ${finalData.name}\n${contactInfo}\n⚠️ Bütçe ayırmayacağını belirtip çıktı.`;
+            message = `📉 <b>BÜTÇE REDDİ (KAYIP)</b>\n👤 ${finalData.name}\n${contactInfo}\n${cityInfo}\n⚠️ Bütçe ayırmayacağını belirtip çıktı.`;
         } else if (actionType === "redirect") {
-            message = `🛍️ <b>PROGRAM SATIŞINA YÖNLENDİRİLDİ</b>\n👤 ${finalData.name}\n${contactInfo}\n🎯 Hedef: ${finalData.goal}\n⚠️ Özel derse bütçe ayırmadı, Shopier'e yönlendirildi.`;
+            message = `🛍️ <b>PROGRAM SATIŞINA YÖNLENDİRİLDİ</b>\n👤 ${finalData.name}\n${contactInfo}\n${cityInfo}\n🎯 Hedef: ${finalData.goal}\n⚠️ Özel derse bütçe ayırmadı, Shopier'e yönlendirildi.`;
         } else {
-            message = `✅ <b>PARA KOKUSU ALIYORUM</b>\n👤 ${finalData.name}\n${contactInfo}\n🎯 Hedef: ${finalData.goal}\n📦 Bütçe: ${finalPackageValue}`;
+            message = `✅ <b>PARA KOKUSU ALIYORUM</b>\n👤 ${finalData.name}\n${contactInfo}\n${cityInfo}\n🎯 Hedef: ${finalData.goal}\n📦 Bütçe: ${finalPackageValue}`;
         }
         await fetch('/api/telegram', {
             method: 'POST',
@@ -323,23 +328,25 @@ function TypeformView({ onExit }: { onExit: () => void }) {
                   <button 
                     key={i} 
                     onClick={() => { 
-                      if (opt === "Şu an bütçe ayırmayı düşünmüyorum, programlarla devam edelim") submitFinalData("PROGRAM_YONLENDIRME", "redirect"); 
-                      else submitFinalData(opt, "success"); 
+                      if (question.key === "package") {
+                          // BÜTÇE (FİYAT) SEÇİMİ
+                          if (opt === "Şu an bütçe ayırmayı düşünmüyorum, programlarla devam edelim") submitFinalData("PROGRAM_YONLENDIRME", "redirect"); 
+                          else submitFinalData(opt, "success"); 
+                      } else {
+                          // ŞEHİR SEÇİMİ
+                          handleChange(opt); 
+                          setTimeout(handleNext, 150); 
+                      }
                     }} 
                     className="group relative w-full p-5 md:p-6 bg-white/[0.03] border border-white/[0.05] rounded-2xl text-left hover:bg-white/[0.08] hover:border-white/20 active:scale-[0.98] transition-all duration-200"
                   >
                     <span className="flex items-center gap-3 text-gray-300 text-sm md:text-lg font-light tracking-wide group-hover:text-white transition-colors pr-8">
                       <span>{opt}</span>
                       
-                      {opt === "Tek ders: 3.000₺" && (
-                        <span className="text-neutral-500/60 line-through decoration-neutral-500/50 decoration-2 text-sm md:text-base font-medium">3.500₺</span>
-                      )}
-                      {opt === "10 Ders: 27.500₺" && (
-                        <span className="text-neutral-500/60 line-through decoration-neutral-500/50 decoration-2 text-sm md:text-base font-medium">30.000₺</span>
-                      )}
-                      {opt === "15 Ders: 33.500₺" && (
-                        <span className="text-neutral-500/60 line-through decoration-neutral-500/50 decoration-2 text-sm md:text-base font-medium">35.000₺</span>
-                      )}
+                      {/* ÜZERİ ÇİZİLİ FİYATLAR (SADECE PAKET ADIMINDA) */}
+                      {question.key === "package" && opt === "Tek ders: 3.000₺" && <span className="text-neutral-500/60 line-through decoration-2 text-sm md:text-base font-medium">3.500₺</span>}
+                      {question.key === "package" && opt === "10 Ders: 27.500₺" && <span className="text-neutral-500/60 line-through decoration-2 text-sm md:text-base font-medium">30.000₺</span>}
+                      {question.key === "package" && opt === "15 Ders: 33.500₺" && <span className="text-neutral-500/60 line-through decoration-2 text-sm md:text-base font-medium">35.000₺</span>}
                     </span>
                     <span className="absolute right-5 top-1/2 -translate-y-1/2 text-white/20 group-hover:translate-x-1 group-hover:text-white transition-all text-xl">→</span>
                   </button>
@@ -380,7 +387,7 @@ function TypeformView({ onExit }: { onExit: () => void }) {
   );
 }
 
-// --- ADMIN PANELİ (GÜNCELLENDİ: FİYATTA KALANLARI GÖSTERİYOR) ---
+// --- ADMIN PANELİ (ŞEHİR SÜTUNU EKLENDİ) ---
 function AdminDashboard() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
@@ -425,6 +432,7 @@ function AdminDashboard() {
               <tr className="bg-[#0f0f0f] text-gray-500 text-[10px] uppercase tracking-widest border-b border-white/5">
                 <th className="py-5 px-6">Durum</th>
                 <th className="py-5 px-6">İsim</th>
+                <th className="py-5 px-6">Şehir</th> {/* YENİ */}
                 <th className="py-5 px-6">Paket Seçimi</th>
                 <th className="py-5 px-6">İletişim</th>
                 <th className="py-5 px-6">Tarih</th>
@@ -433,11 +441,11 @@ function AdminDashboard() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={6} className="p-10 text-center animate-pulse">Yükleniyor...</td></tr>
+                <tr><td colSpan={7} className="p-10 text-center animate-pulse">Yükleniyor...</td></tr>
               ) : leads.map((item) => {
                 const isDropOff = item.package === "FİYAT_ÇIKIŞ" || item.package === "BÜTÇE_YOK_ÇIKIŞ";
                 const isRedirect = item.package === "PROGRAM_YONLENDIRME";
-                const isContactOnly = item.package === "İLETİŞİM_BIRAKTI"; // Yeni Statü
+                const isContactOnly = item.package === "İLETİŞİM_BIRAKTI"; 
 
                 const rowClass = isDropOff ? 'bg-red-900/5' : isRedirect ? 'bg-blue-900/5' : isContactOnly ? 'bg-yellow-900/5' : '';
 
@@ -450,6 +458,7 @@ function AdminDashboard() {
                          <span className="text-[10px] bg-green-900/30 text-green-500 px-2 py-1 rounded border border-green-900/50 font-bold">ADAY</span>}
                     </td>
                     <td className="py-5 px-6 font-medium text-gray-200">{item.name}</td>
+                    <td className="py-5 px-6 text-gray-300">{item.city || "-"}</td> {/* YENİ */}
                     <td className="py-5 px-6">
                         {isContactOnly ? <span className="text-yellow-500/50 italic text-xs">Paket Seçmedi</span> : 
                          item.package?.replace("PROGRAM_YONLENDIRME", "SHOPİER") || "-"}
