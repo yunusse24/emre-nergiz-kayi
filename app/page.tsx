@@ -40,7 +40,7 @@ const successStories = [
     id: 5,
     title: "İlk Adım ve Reaksiyon",
     description: "Tekniği çok iyi olmasına rağmen 'yavaş' olduğu için elit takımların radarına giremeyen öğrencimin ilk 5 metre patlayıcılığı üzerine çalıştık. Sprint mekaniğini baştan aşağı değiştirerek ivmelenme süresini elit seviyeye çektik. Bu sezon 8 gol ve 17 asist yaptı.",
-    image: "/student2.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
+    image: "/koşutogedaaa.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
     tag: "İlk Adım ve Reaksiyon"
   },
 
