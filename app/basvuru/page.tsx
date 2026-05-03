@@ -27,7 +27,7 @@ type Lead = {
   created_at: string;
 };
 
-// --- SORULAR (ŞEHİR ADIMI BURADA) ---
+// --- SORULAR ---
 const steps: FormStep[] = [
   { id: 1, question: "Önce tanışalım, ismin nedir?", type: "text", placeholder: "Adın Soyadın...", key: "name" },
   { id: 2, question: "Kaç yaşındasın?", type: "number", placeholder: "Örn: 17", key: "age" },
@@ -212,7 +212,7 @@ function TypeformView({ onExit }: { onExit: () => void }) {
   const progress = ((currentStep + 1) / totalSteps) * 100;
 
   const handleNext = async () => {
-    // 1. Eğer iletişim adımındaysak, Validasyon ve İLK KAYIT işlemi yap
+    // 1. İletişim Adımı (Veritabanı İlk Kayıt)
     if (steps[currentStep].type === 'contact') {
         if (contactMethod === 'phone') {
             const phoneVal = String(formData.phone || "");
@@ -330,7 +330,7 @@ function TypeformView({ onExit }: { onExit: () => void }) {
                     key={i} 
                     onClick={async () => { 
                       if (question.key === "package") {
-                          // PAKET SEÇİMİ VE FİNAL KAYIT
+                          // BÜTÇE (FİYAT) SEÇİMİ
                           if (opt === "Şu an bütçe ayırmayı düşünmüyorum, programlarla devam edelim") submitFinalData("PROGRAM_YONLENDIRME", "redirect"); 
                           else submitFinalData(opt, "success"); 
                       } else if (question.key === "city") {
@@ -339,6 +339,7 @@ function TypeformView({ onExit }: { onExit: () => void }) {
                           setFormData(newFormData);
 
                           if (leadId) {
+                              // Şehir seçildiği an, veri tabanına hem şehri yaz hem de durumu "FİYATTA KALDI" yap
                               await supabase.from('leads').update({
                                   city: opt,
                                   package: "FİYATTA KALDI"
@@ -355,7 +356,7 @@ function TypeformView({ onExit }: { onExit: () => void }) {
                     <span className="flex items-center gap-3 text-gray-300 text-sm md:text-lg font-light tracking-wide group-hover:text-white transition-colors pr-8">
                       <span>{opt}</span>
                       
-                      {/* ÜZERİ ÇİZİLİ FİYATLAR (SADECE PAKET ADIMINDA GÖSTER) */}
+                      {/* ÜZERİ ÇİZİLİ FİYATLAR (SADECE PAKET ADIMINDA) */}
                       {question.key === "package" && opt === "Tek ders: 3.000₺" && <span className="text-neutral-500/60 line-through decoration-2 text-sm md:text-base font-medium">3.500₺</span>}
                       {question.key === "package" && opt === "10 Ders: 27.500₺" && <span className="text-neutral-500/60 line-through decoration-2 text-sm md:text-base font-medium">30.000₺</span>}
                       {question.key === "package" && opt === "15 Ders: 33.500₺" && <span className="text-neutral-500/60 line-through decoration-2 text-sm md:text-base font-medium">35.000₺</span>}
@@ -457,22 +458,25 @@ function AdminDashboard() {
               ) : leads.map((item) => {
                 const isDropOff = item.package === "FİYAT_ÇIKIŞ" || item.package === "BÜTÇE_YOK_ÇIKIŞ";
                 const isRedirect = item.package === "PROGRAM_YONLENDIRME";
-                const isContactOnly = item.package === "İLETİŞİM_BIRAKTI" || item.package === "FİYATTA KALDI";
 
-                const rowClass = isDropOff ? 'bg-red-900/5' : isRedirect ? 'bg-blue-900/5' : isContactOnly ? 'bg-yellow-900/5' : '';
+                let rowClass = 'hover:bg-white/[0.02]';
+                if (isDropOff) rowClass = 'bg-red-900/5';
+                else if (isRedirect) rowClass = 'bg-blue-900/5';
+                else if (item.package === "FİYATTA KALDI" || item.package === "İLETİŞİM_BIRAKTI") rowClass = 'bg-yellow-900/5';
 
                 return (
-                  <tr key={item.id} className={`border-b border-white/5 transition-colors ${rowClass} hover:bg-white/[0.02]`}>
+                  <tr key={item.id} className={`border-b border-white/5 transition-colors ${rowClass}`}>
                     <td className="py-5 px-6">
                         {isDropOff ? <span className="text-[10px] bg-red-900/30 text-red-500 px-2 py-1 rounded border border-red-900/50 font-bold">KAÇTI</span> : 
                          isRedirect ? <span className="text-[10px] bg-blue-900/30 text-blue-500 px-2 py-1 rounded border border-blue-900/50 font-bold">SHOPİER</span> : 
-                         isContactOnly ? <span className="text-[10px] bg-yellow-900/30 text-yellow-500 px-2 py-1 rounded border border-yellow-900/50 font-bold" title="Fiyatları gördü ama paket seçmeden çıktı.">FİYATTA KALDI</span> : 
+                         item.package === "FİYATTA KALDI" ? <span className="text-[10px] bg-yellow-900/30 text-yellow-500 px-2 py-1 rounded border border-yellow-900/50 font-bold" title="Fiyatları gördü ama paket seçmeden çıktı.">FİYATTA KALDI</span> : 
+                         item.package === "İLETİŞİM_BIRAKTI" ? <span className="text-[10px] bg-yellow-900/30 text-yellow-500 px-2 py-1 rounded border border-yellow-900/50 font-bold" title="İletişimi bıraktı, fiyatları görmeden çıktı.">İLETİŞİM</span> : 
                          <span className="text-[10px] bg-green-900/30 text-green-500 px-2 py-1 rounded border border-green-900/50 font-bold">ADAY</span>}
                     </td>
                     <td className="py-5 px-6 font-medium text-gray-200">{item.name}</td>
                     <td className="py-5 px-6 text-gray-300">{item.city || "-"}</td>
                     <td className="py-5 px-6">
-                        {isContactOnly ? <span className="text-yellow-500/50 italic text-xs">Paket Seçmedi</span> : 
+                        {(item.package === "FİYATTA KALDI" || item.package === "İLETİŞİM_BIRAKTI") ? <span className="text-yellow-500/50 italic text-xs">Paket Seçmedi</span> : 
                          item.package?.replace("PROGRAM_YONLENDIRME", "SHOPİER") || "-"}
                     </td>
                     <td className="py-5 px-6 font-mono text-xs">{item.phone ? `📱 ${item.phone}` : item.instagram ? `📸 @${item.instagram}` : "-"}</td>
