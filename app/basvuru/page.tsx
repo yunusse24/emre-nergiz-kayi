@@ -46,8 +46,8 @@ const steps: FormStep[] = [
     type: "select", 
     options: [
       "Tek ders: 3.000₺", 
-      "10 Ders: 27.500₺", 
-      "15 Ders: 33.500₺",
+      "10 Ders: 22.500₺", 
+      "15 Ders: 30.000₺",
       "Şu an bütçe ayırmayı düşünmüyorum, programlarla devam edelim" 
     ], 
     key: "package",
