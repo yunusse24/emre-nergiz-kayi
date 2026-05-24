@@ -8,7 +8,7 @@ const successStories = [
   {
     id: 1,
     title: "FENERBAHÇE'YE TRANSFER",
-    description: "Bağlarbaşı sk da oynayan sporcum teknik becerileri son derecede yetenekli bir sporcuydu lakin dayanıklılık ve hız sorunundan kaynaklı çabuk yoruluyor performansı düşüyordu. 8 aylık birlikteliğimizin ardından geçtiğimiz sezon 10 gol atan sporcum bu sezon 28 gol ve asiste ulaştı. Fenerbahçe'nin ve Beşiktaş'ın Scout ekibi sezon bitince takımlarında antrenmana çıkmasını istediler.",
+    description: "Bağlarbaşı sk da oynayan sporcum teknik becerileri son derecede yetenekli bir sporcuydu lakin kondisyon ve hız sorunundan kaynaklı çabuk yoruluyor performansı düşüyordu. 8 aylık birlikteliğimizin ardından geçtiğimiz sezon 10 gol atan sporcum bu sezon 28 gol ve asiste ulaştı. Fenerbahçe'nin ve Beşiktaş'ın Scout ekibi sezon bitince takımlarında antrenmana çıkmasını istediler.",
     image: "/student2.jpg", // public klasöründeki fotoğraf adı
     tag: "FENERBAHÇE'YE TRANSFER"
   },
@@ -155,12 +155,12 @@ export default function LandingPage() {
               </h2>
               <div className="space-y-6 text-neutral-400 text-sm md:text-base leading-relaxed font-light">
                 <p>
-                  Marmara Üniversitesi Spor Bilimleri mezunu, Fenerbahçe ve <strong>Milli Takım Olimpik kadro</strong> sporcusuyum. 
-                  100m ve 400m Engel branşında kazandığım <strong>86 Madalya ve 24 Kupa</strong> ile profesyonel sporculuk kariyerimi taçlandırdım.
+                  Marmara Üniversitesi Spor Bilimleri mezunu, Fenerbahçe ve <strong>Milli Takım ve Olimpik Kadro</strong> sporcusuyum. 
+                  100m ve 400m Engel branşında kazandığım <strong>86 Madalya ve 24 Kupa</strong> ile profesyonel sporculuk kariyerimi sonlandırdım.
                 </p>
                 <p>
-                  Şimdi ise sahada kazandığım bu "Elit" tecrübeyi, bilimsel verilerle birleştirerek yeni nesil sporculara aktarıyorum. 
-                  Amacım sadece antrenman yaptırmak değil; sporcunun kariyerini, fiziğini ve mentalitesini profesyonel seviyeye taşımak.
+                  Şimdi ise sahada kazandığım tecrübeyi, akademik verilerle birleştirerek yeni nesil sporculara aktarıyorum. 
+                  Amacım sadece antrenman yaptırmak değil; sporcunun kariyerini, fiziğini ve mentalitesini profesyonel seviyeye ulaştırmak.
                 </p>
               </div>
             </div>
@@ -179,8 +179,7 @@ export default function LandingPage() {
             
             {/* EKLENEN KISIM: Silik Uyarı Metni */}
             <p className="text-[10px] text-white/40 mt-3 font-light italic tracking-wide">
-              (Çocuk hakları ve gizlilik nedeniyle temsili resimler kullanılmıştır)
-            </p>
+...            </p>
           </div>
 
           <div className="flex flex-col gap-24">
