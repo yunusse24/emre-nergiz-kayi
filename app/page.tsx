@@ -48,7 +48,7 @@ const successStories = [
     id: 6,
     title: "Yüksek Şiddetli Koşu Kapasitesi / Laktik Asit Toleransı",
     description: "Maçın son 20 dakikasında laktik asit eşiği düşük olduğu için oyundan kopan merkez orta saha oyuncumla 4 aylık interval ve dayanıklılık odaklı bir periyot geçirdik. Yüksek şiddetli koşu (High Intensity Running) mesafesini kat ve kat arttırdık, artık maçın 90. dakikasında bile geçiş hücumlarını yönetiyor.",
-    image: "/student2.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
+    image: "/Esneklik.jpeg", // Fotoğrafın yoksa geçici olarak bunu kullanır
     tag: "Laktik Asit Toleransı"
   },
 
@@ -143,7 +143,7 @@ export default function LandingPage() {
               <div className="absolute inset-0 border border-white/10 rounded-sm translate-x-3 translate-y-3 z-0"></div>
               <div className="relative h-full w-full bg-neutral-900 overflow-hidden border border-white/10 z-10">
                 {/* Profil Fotonu 'profil.jpg' olarak public klasörüne at */}
-                <Image src="/profil.jpg" alt="Emre Nergiz" fill className="object-cover" />
+                <Image src="/run.jpeg" alt="Emre Nergiz" fill className="object-cover" />
               </div>
             </div>
 
