@@ -17,7 +17,7 @@ const successStories = [
     id: 2,
     title: "BİYOMEKANİK DÜZELTME",
     description: "Koşu sırasında dizlerin dışa kaçma (Varum) problemini 8 haftalık direnç bandı ve kuvvet antrenmanlarıyla çözdük. Artık sakatlık riski olmadan maksimum kuvvet ve sürat antrenmanları yapabiliyor ve gelişim katsayısı hızla artıyor.",
-    image: "/student2.jpg",
+    image: "/dirençbandısıçrama.png",
     tag: "BİYOMEKANİK DÜZELTME"
   },
   // --- YENİ EKLEMEK İÇİN BURADAN AŞAĞISINI KOPYALA ---
