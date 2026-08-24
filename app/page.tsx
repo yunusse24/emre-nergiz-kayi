@@ -25,7 +25,7 @@ const successStories = [
     id: 3,
     title: "Kadro dışından ilk 11'e",
     description: "Antalya spor altyapısında olan sporcum geçtiğimiz sezon 9 maçta kadro dışı kaldı, hocası 'performansını yükseltmezsen gelecek sezon kadroda değilsin' demesinin üzerine İstanbul'da yaz boyu haftada 6 gün benimle çalıştı. Bu süreçte dayanıklılığını patlayıcılığı ve son süratini yüksek miktarda geliştirdim. bu sezon her maça ilk 11 çıktı ve takımın en hızlı oyuncusu haline geldi. ",
-    image: "/student2.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
+    image: "/140kg.png", // Fotoğrafın yoksa geçici olarak bunu kullanır
     tag: "Kadro dışından ilk 11'e"
   },
   // --- BURAYA KADAR ---
@@ -57,7 +57,7 @@ const successStories = [
     id: 7,
     title: "Biyomekanik ve Esneklik",
     description: "Düşük esneklik kabiliyeti olan sporcum hareket kısıklılığı nedeniyle kaslarını kuvvetlendiremiyor ve yük dizlerine binip çeşitli hamstring ve diz sakatlık/yaralanmaları yaşıyordu. Acı dolu 8 haftanın ardından hareket kabiliyeti artan sporcum hem patlayıcı güç antrenmanlarımı yapabiliyor ve sakatlıktan korunarak becerilerini sergileyebiliyor. ",
-    image: "/esneklik.png", // Fotoğrafın yoksa geçici olarak bunu kullanır
+    image: "/Esneklik.png", // Fotoğrafın yoksa geçici olarak bunu kullanır
     tag: "Biyomekanik ve Esneklik"
   },
 ];
