@@ -74,7 +74,7 @@ export default function LandingPage() {
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-red-900/10 via-transparent to-[#050505] z-0"></div>
         
         {/* Logo */}
-        <div className="relative w-24 h-24 md:w-32 md:h-32 mb-8 z-10 animate-in fade-in zoom-in duration-1000">
+        <div className="relative w-36 h-36 md:w-32 md:h-32 mb-8 z-10 animate-in fade-in zoom-in duration-1000">
           <Image src="/mainlogo_white.png" alt="Emre Nergiz" fill className="object-contain" priority />
         </div>
 
