@@ -57,7 +57,7 @@ const successStories = [
     id: 7,
     title: "Biyomekanik ve Esneklik",
     description: "Düşük esneklik kabiliyeti olan sporcum hareket kısıklılığı nedeniyle kaslarını kuvvetlendiremiyor ve yük dizlerine binip çeşitli hamstring ve diz sakatlık/yaralanmaları yaşıyordu. Acı dolu 8 haftanın ardından hareket kabiliyeti artan sporcum hem patlayıcı güç antrenmanlarımı yapabiliyor ve sakatlıktan korunarak becerilerini sergileyebiliyor. ",
-    image: "/Esneklik.png", // Fotoğrafın yoksa geçici olarak bunu kullanır
+    image: "/esneklik.png", // Fotoğrafın yoksa geçici olarak bunu kullanır
     tag: "Biyomekanik ve Esneklik"
   },
 ];
