@@ -1,3 +1,4 @@
+//git add . && git commit -m "admin giris sistemi eklendi" && git push
 "use client";
 import { useState, useEffect } from "react";
 import Image from "next/image";
@@ -45,14 +46,14 @@ const steps: FormStep[] = [
     question: "Atletik gelişimin için planladığın tahmini bütçe aralığı nedir?", 
     type: "select", 
     options: [
-      "Tek Ders: 2.250 ₺ (Ders başı: 2.250 ₺)"
-      "10 Ders: 19.000 ₺ (Ders başı: 1.900 ₺ — %15 İndirimli)"
-      "15 Ders: 25.300 ₺ (Ders başı: 1.685 ₺ — %25 İndirimli)"
+      "Tek Ders: 2.250 ₺",
+      "10 Ders: 17.500 ₺ (Ders başı: 1.750 ₺ — %22,2 indirimli)",
+      "15 Ders: 24.000 ₺ (Ders başı: 1.600 ₺ — %28,9 indirimli)",
       "Şu an bütçe ayırmayı düşünmüyorum, programlarla devam edelim" 
     ], 
     key: "package",
-    note: "📍 Antrenman Yeri: İstanbul Burhan Felek Atletizm Pisti\n\n⚠️ Dikkat: Paketlerin 5 hafta içerisinde bitirilmesi zorunludur. Aksi takdirde antrenman bilimi gereği gelişim %40 düşer."
-  },
+    note: "📍 Antrenman Yerleri:\n• Burhan Felek Atletizm Pisti\n• Maltepe Kenan Onuk Atletizm Pisti\n• TAF Ataköy Atletizm Pisti"
+  }
 ];
 
 // --- LOGO BİLEŞENİ ---
