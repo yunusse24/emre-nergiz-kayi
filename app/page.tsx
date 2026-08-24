@@ -1,3 +1,4 @@
+//git add . && git commit -m "admin giris sistemi eklendi" && git push
 import Link from "next/link";
 import Image from "next/image";
 
@@ -48,7 +49,7 @@ const successStories = [
     id: 6,
     title: "Yüksek Şiddetli Koşu Kapasitesi / Laktik Asit Toleransı",
     description: "Maçın son 20 dakikasında laktik asit eşiği düşük olduğu için oyundan kopan merkez orta saha oyuncumla 4 aylık interval ve dayanıklılık odaklı bir periyot geçirdik. Yüksek şiddetli koşu (High Intensity Running) mesafesini kat ve kat arttırdık, artık maçın 90. dakikasında bile geçiş hücumlarını yönetiyor.",
-    image: "/Esneklik.jpeg", // Fotoğrafın yoksa geçici olarak bunu kullanır
+    image: "/Esneklik.png", // Fotoğrafın yoksa geçici olarak bunu kullanır
     tag: "Laktik Asit Toleransı"
   },
 
@@ -56,7 +57,7 @@ const successStories = [
     id: 7,
     title: "Biyomekanik ve Esneklik",
     description: "Düşük esneklik kabiliyeti olan sporcum hareket kısıklılığı nedeniyle kaslarını kuvvetlendiremiyor ve yük dizlerine binip çeşitli hamstring ve diz sakatlık/yaralanmaları yaşıyordu. Acı dolu 8 haftanın ardından hareket kabiliyeti artan sporcum hem patlayıcı güç antrenmanlarımı yapabiliyor ve sakatlıktan korunarak becerilerini sergileyebiliyor. ",
-    image: "/student2.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
+    image: "/Esneklik.png", // Fotoğrafın yoksa geçici olarak bunu kullanır
     tag: "Biyomekanik ve Esneklik"
   },
 ];
