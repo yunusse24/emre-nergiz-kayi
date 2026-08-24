@@ -10,7 +10,7 @@ const successStories = [
     id: 1,
     title: "FENERBAHÇE'YE TRANSFER",
     description: "Bağlarbaşı sk da oynayan sporcum teknik becerileri son derecede yetenekli bir sporcuydu lakin kondisyon ve hız sorunundan kaynaklı çabuk yoruluyor performansı düşüyordu. 8 aylık birlikteliğimizin ardından geçtiğimiz sezon 10 gol atan sporcum bu sezon 28 gol ve asiste ulaştı. Fenerbahçe'nin ve Beşiktaş'ın Scout ekibi sezon bitince takımlarında antrenmana çıkmasını istediler.",
-    image: "/student2.jpg", // public klasöründeki fotoğraf adı
+    image: "/ikilikoşu.png", // public klasöründeki fotoğraf adı
     tag: "FENERBAHÇE'YE TRANSFER"
   },
   {
@@ -49,7 +49,7 @@ const successStories = [
     id: 6,
     title: "Yüksek Şiddetli Koşu Kapasitesi / Laktik Asit Toleransı",
     description: "Maçın son 20 dakikasında laktik asit eşiği düşük olduğu için oyundan kopan merkez orta saha oyuncumla 4 aylık interval ve dayanıklılık odaklı bir periyot geçirdik. Yüksek şiddetli koşu (High Intensity Running) mesafesini kat ve kat arttırdık, artık maçın 90. dakikasında bile geçiş hücumlarını yönetiyor.",
-    image: "/Esneklik.png", // Fotoğrafın yoksa geçici olarak bunu kullanır
+    image: "/laktikasit.png", // Fotoğrafın yoksa geçici olarak bunu kullanır
     tag: "Laktik Asit Toleransı"
   },
 
