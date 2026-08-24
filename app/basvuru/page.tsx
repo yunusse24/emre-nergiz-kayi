@@ -43,7 +43,7 @@ const steps: FormStep[] = [
   },
   { 
     id: 6, 
-    question: "Atletik gelişimin için planladığın tahmini bütçe aralığı nedir?", 
+    question: "Hedeflerine ulaşmak için sana en uygun antrenman paketini seçelim.", 
     type: "select", 
     options: [
       "Tek Ders: 2.250 ₺",
