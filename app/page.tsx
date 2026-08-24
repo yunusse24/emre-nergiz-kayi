@@ -33,7 +33,7 @@ const successStories = [
     id: 4,
     title: "Dikey Sıçrama ve Hava Hakimiyeti",
     description: "Hava toplarında zaafı olan 1.82 boyundaki stoper öğrencimle, 12 haftalık plyometrik ve eksantrik yüklenme antrenmanları uyguladım. Dikey sıçrama mesafesini 14 cm artırarak boy dezavantajını ortadan kaldırdık. Sezonun ikinci yarısında duran toplardan 4 gol bularak takıma büyük katkıda bulundu.",
-    image: "/student2.jpg", // Fotoğrafın yoksa geçici olarak bunu kullanır
+    image: "/dikeysıçrama.png", // Fotoğrafın yoksa geçici olarak bunu kullanır
     tag: "Dikey Sıçrama ve Hava Hakimiyeti"
   },
 
