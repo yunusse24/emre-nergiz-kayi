@@ -75,7 +75,7 @@ export default function LandingPage() {
         
         {/* Logo */}
         <div className="relative w-24 h-24 md:w-32 md:h-32 mb-8 z-10 animate-in fade-in zoom-in duration-1000">
-          <Image src="/logo.png" alt="Emre Nergiz" fill className="object-contain" priority />
+          <Image src="/mainlogo.png" alt="Emre Nergiz" fill className="object-contain" priority />
         </div>
 
         {/* Başlık */}
