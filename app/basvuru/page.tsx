@@ -46,9 +46,9 @@ const steps: FormStep[] = [
     question: "Hedeflerine ulaşmak için sana en uygun antrenman paketini seçelim.", 
     type: "select", 
     options: [
-      "Tek Ders: 2.250 ₺",
-      "10 Ders: 17.500 ₺ (Ders başı: 1.750 ₺ — %22,2 indirimli)",
-      "15 Ders: 24.000 ₺ (Ders başı: 1.600 ₺ — %28,9 indirimli)",
+      "Tek Ders: 3.000 ₺",
+      "10 Ders: 25.000 ₺ (Ders başı: 2.500 ₺ — %17 indirimli)",
+      "15 Ders: 35.000 ₺ (Ders başı: 2.333 ₺ — %23 indirimli)",
       "Şu an bütçe ayırmayı düşünmüyorum, programlarla devam edelim" 
     ], 
     key: "package",
